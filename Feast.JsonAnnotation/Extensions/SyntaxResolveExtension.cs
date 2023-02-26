@@ -52,6 +52,9 @@ namespace Feast.JsonAnnotation.Extensions
             if (node is not ClassDeclarationSyntax declareNode) return;
             SyntaxList<AttributeListSyntax> attrs = declareNode.AttributeLists;
             var check = attrs.ContainsAttribute(GetUsingSet(node.SyntaxTree.FilePath));
+            if (check)
+            {
+            }
         }
         internal static bool ContainsAttribute(this SyntaxList<AttributeListSyntax> list, FileScopeUsing scope)
         {

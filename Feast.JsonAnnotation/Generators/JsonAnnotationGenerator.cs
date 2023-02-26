@@ -24,7 +24,6 @@ namespace Feast.JsonAnnotation.Generators
 
         public void Execute(GeneratorExecutionContext context)
         {
-
         }
     }
 }
