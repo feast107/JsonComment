@@ -25,9 +25,11 @@ namespace Feast.JsonAnnotation.Extensions
             }
             return ret;
         }
+
+        internal static string GetSelfClassName(this ClassDeclarationSyntax node) => node.Identifier.Text;
         internal static string GetClassName(this ClassDeclarationSyntax node)
         {
-            var ret = node.Identifier.Text;
+            var ret = node.GetSelfClassName();
             var tmp = node.Parent;
             while (tmp is ClassDeclarationSyntax classDeclaration)
             {
@@ -51,6 +53,10 @@ namespace Feast.JsonAnnotation.Extensions
             return nameSpace;
         }
 
+        internal static bool IsInnerClassOf(this ClassDeclarationSyntax node, ClassDeclarationSyntax another)
+        {
+            return (another.Equals(node.Parent));
+        }
         internal static bool Has(this SyntaxTokenList list, SyntaxKind kind) => list.Any(x => x.IsKind(kind));
         internal static bool Has(this ClassDeclarationSyntax declaration, SyntaxKind kind) => declaration.Modifiers.Any(x => x.IsKind(kind));
         internal static Tuple<string,string> GetFullClassName(this ClassDeclarationSyntax node)

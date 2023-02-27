@@ -13,6 +13,9 @@ namespace Feast.JsonAnnotation.Structs
         #region Fields
         public ClassScope() { }
         internal readonly Type Type = typeof(TClass);
+        /// <summary>
+        /// Key:源文件,Value域
+        /// </summary>
         internal readonly Dictionary<string, FileScope> TypeUsing = new();
         public required Func<ClassDeclarationSyntax, FileScope, bool> WhetherDeclared { get; init; }
         #endregion

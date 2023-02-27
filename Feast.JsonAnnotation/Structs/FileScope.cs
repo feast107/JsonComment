@@ -16,7 +16,7 @@ namespace Feast.JsonAnnotation.Structs
                 : type.Name;
             FullName = $"{Namespace}.{ClassName}";
             aliasSet = new() { FullName };
-            usingClass = new();
+            UsingClass = new();
         }
         #region Fields
         public string ClassName { get; }
@@ -24,14 +24,18 @@ namespace Feast.JsonAnnotation.Structs
         public string FullName { get; }
         public Type Type { get; }
         private readonly HashSet<string> aliasSet;
-        private readonly Dictionary<string,HashSet<ClassDeclarationSyntax>> usingClass;
-        public bool Used => usingClass.Count > 0;
+
+        /// <summary>
+        /// Key:命名空间,Value:类
+        /// </summary>
+        internal readonly Dictionary<string,HashSet<ClassDeclarationSyntax>> UsingClass;
+        public bool Used => UsingClass.Count > 0;
         #endregion
         private HashSet<ClassDeclarationSyntax> GetClassesByNamespace(string nameSpace)
         {
-            if (usingClass.TryGetValue(nameSpace, out var set)) return set;
+            if (UsingClass.TryGetValue(nameSpace, out var set)) return set;
             set = new ();
-            usingClass[nameSpace] = set;
+            UsingClass[nameSpace] = set;
             return set;
         }
         public void Use(string nameSpace, ClassDeclarationSyntax node) => GetClassesByNamespace(nameSpace).Add(node);
