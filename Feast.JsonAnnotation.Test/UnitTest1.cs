@@ -8,12 +8,14 @@ namespace Feast.JsonAnnotation.Test
         [SetUp]
         public void Setup()
         {
-            _ = new BasicUsing();
         }
 
         [Test]
         public void Test()
         {
+            var str = new BasicUsing().Generate();
+            Console.WriteLine(str);
+            
         }
     }
 }
