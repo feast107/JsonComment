@@ -6,7 +6,7 @@ namespace Feast.JsonAnnotation.Generators
 {
     internal class JsonAnnotationReceiver : ISyntaxReceiver 
     {
-        private readonly ClassUsing<JsonAnnotationAttribute> classUsing = new()
+        private readonly ClassScope<JsonAnnotationAttribute> classUsing = new()
         {
             WhetherDeclared = (node, set) => set.ContainsAttribute(node.AttributeLists)
         };
@@ -14,7 +14,8 @@ namespace Feast.JsonAnnotation.Generators
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
             classUsing.ResolveUsing(syntaxNode);
-            classUsing.ResolveDeclare(syntaxNode);
+            classUsing.ResolveNamespaceDeclare(syntaxNode);
+            classUsing.ResolveClassDeclare(syntaxNode);
         }
     }
 }

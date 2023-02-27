@@ -1,22 +1,27 @@
-﻿using Feast.JsonAnnotation;
-using Another = Feast.JsonAnnotation.JsonAnnotationAttribute;
+﻿using Another = Feast.JsonAnnotation.JsonAnnotationAttribute;
 using Differ = Feast.JsonAnnotation;
 using Full = Feast.JsonAnnotation;
 
-namespace Feast.JsonAnnotation.Run
+namespace Feast.JsonAnnotation.Run;
+
+[JsonAnnotation]
+public class BasicUsing
 {
-    [JsonAnnotation]
-    public class BasicUsing { }
-
     [Another]
-    public class AnotherNaming { }
+    public class SubClass
+    {
 
-    [Feast.JsonAnnotation.JsonAnnotation]
-    public class FullNamespace { }
-
-    [Differ.JsonAnnotation]
-    public class DifferedNamedSpace { }
-
-    [Full.JsonAnnotation]
-    public class FullNamedSpace { }
+    }
 }
+
+[Another]
+public class AnotherNaming { }
+
+[Feast.JsonAnnotation.JsonAnnotation]
+public class FullNamespace { }
+
+[Differ.JsonAnnotation]
+public class DifferedNamedSpace { }
+
+[Full.JsonAnnotation]
+public class FullNamedSpace { }

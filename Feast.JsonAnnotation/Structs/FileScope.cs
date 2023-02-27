@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Xml;
 
 namespace Feast.JsonAnnotation.Structs
 {
-    internal struct FileScopeUsing
+    internal readonly struct FileScope
     {
-        public FileScopeUsing(Type type)
+        public FileScope(Type type)
         {
             Type = type;
             Namespace = type.Namespace ?? throw new ArgumentException($"Type {type} has no namespace");
@@ -15,14 +15,23 @@ namespace Feast.JsonAnnotation.Structs
                 : type.Name;
             FullName = $"{Namespace}.{ClassName}";
             aliasSet = new() { FullName };
+            usingClass = new();
         }
         public string Namespace { get; }
         public string ClassName { get; }
         public string FullName { get; }
         public Type Type { get; }
         private readonly HashSet<string> aliasSet;
-        public bool Used { get; private set; }
-        public bool Use() => Used = true;
+        private readonly Dictionary<string,HashSet<string>> usingClass;
+        private HashSet<string> GetClassesByNamespace(string nameSpace)
+        {
+            if (usingClass.TryGetValue(nameSpace, out var set)) return set;
+            set = new ();
+            usingClass[nameSpace] = set;
+            return set;
+        }
+        public bool Used => usingClass.Count > 0;
+        public void Use(string nameSpace, string className) => GetClassesByNamespace(nameSpace).Add(className);
 
         /// <summary>
         /// 是否有效声明
@@ -30,6 +39,8 @@ namespace Feast.JsonAnnotation.Structs
         /// <param name="prefix">前缀</param>
         /// <returns></returns>
         public bool IsQualifiedDeclaration(string prefix) => prefix.Equals(Type.FullName) || FullName.StartsWith(prefix);
+
+        public bool HasSameNamespace(string nameSpace) => nameSpace.StartsWith(Namespace);
 
 #nullable enable
         /// <summary>

@@ -7,12 +7,12 @@ using Feast.JsonAnnotation.Extensions;
 
 namespace Feast.JsonAnnotation.Structs
 {
-    internal readonly struct ClassUsing<TClass>
+    internal readonly struct ClassScope<TClass>
     {
         internal readonly Type Type = typeof(TClass);
-        private readonly Dictionary<string, FileScopeUsing> typeUsing = new();
-        public ClassUsing() { }
-        internal FileScopeUsing GetUsingSet(string filePath)
+        private readonly Dictionary<string, FileScope> typeUsing = new();
+        public ClassScope() { }
+        internal FileScope GetUsingSet(string filePath)
         {
             if (!typeUsing.TryGetValue(filePath, out var namespaces))
             {
@@ -26,7 +26,7 @@ namespace Feast.JsonAnnotation.Structs
             }
             return namespaces;
         }
-        public required Func<ClassDeclarationSyntax, FileScopeUsing,bool> WhetherDeclared { get; init; }
+        public required Func<ClassDeclarationSyntax, FileScope, bool> WhetherDeclared { get; init; }
         internal void ResolveUsing(SyntaxNode node)
         {
             if (node is not UsingDirectiveSyntax realNode) return; //Using 声明
@@ -42,16 +42,25 @@ namespace Feast.JsonAnnotation.Structs
                     .Identifier
                     .Text);
         }
-
-        internal void ResolveDeclare(SyntaxNode node)
+        internal void ResolveNamespaceDeclare(SyntaxNode node)
         {
-            if (node is not ClassDeclarationSyntax declareNode) return;
+            if (node is not BaseNamespaceDeclarationSyntax realNode) return; //Namespace 声明
+            if (!realNode.GetLocation().IsInSource) return;
+            if (realNode.Name is not QualifiedNameSyntax subNode) return;
+            var str = subNode.GetFullUsing();
+            var usingSet = GetUsingSet(realNode.FilePath());
+            if (!usingSet.HasSameNamespace(str)) return;
+            usingSet.RegisterAlias(usingSet.FullName);
+        }
+
+        internal void ResolveClassDeclare(SyntaxNode node)
+        {
+            if (node is not ClassDeclarationSyntax declareNode) return;//Class 声明
             var set = GetUsingSet(node.FilePath());
             var declared = WhetherDeclared(declareNode,set);
-            if (declared)
-            {
-                set.Use();
-            }
+            if (!declared) return;
+            var tuple = declareNode.GetFullClassName();
+            set.Use(tuple.Item1, tuple.Item2);
         }
     }
 }
