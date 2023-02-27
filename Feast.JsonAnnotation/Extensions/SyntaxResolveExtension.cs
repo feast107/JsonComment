@@ -1,11 +1,9 @@
-﻿using System;
-using Feast.JsonAnnotation;
-using Feast.JsonAnnotation.Structs;
+﻿using Feast.JsonAnnotation.Structs;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Collections.Generic;
+using System;
 using System.Linq;
-using System.Security.Cryptography;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Feast.JsonAnnotation.Extensions
 {
@@ -27,19 +25,22 @@ namespace Feast.JsonAnnotation.Extensions
             }
             return ret;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns>Item1:Namespace,Item2:ClassName</returns>
-        internal static Tuple<string,string> GetFullClassName(this ClassDeclarationSyntax node)
+        internal static string GetClassName(this ClassDeclarationSyntax node)
         {
-            var className = node.Identifier.Text;
+            var ret = node.Identifier.Text;
             var tmp = node.Parent;
             while (tmp is ClassDeclarationSyntax classDeclaration)
             {
-                className = $"{classDeclaration.Identifier.Text}.{className}";
+                ret = $"{classDeclaration.Identifier.Text}.{ret}";
+                tmp = classDeclaration.Parent;
+            }
+            return ret;
+        }
+        internal static string GetNamespace(this ClassDeclarationSyntax node)
+        {
+            var tmp = node.Parent;
+            while (tmp is ClassDeclarationSyntax classDeclaration)
+            {
                 tmp = classDeclaration.Parent;
             }
             var nameSpace = string.Empty;
@@ -47,9 +48,15 @@ namespace Feast.JsonAnnotation.Extensions
             {
                 nameSpace = ((QualifiedNameSyntax)namespaceDeclaration.Name).GetFullUsing();
             }
-            return new(nameSpace, className);
+            return nameSpace;
         }
 
+        internal static bool Has(this SyntaxTokenList list, SyntaxKind kind) => list.Any(x => x.IsKind(kind));
+        internal static bool Has(this ClassDeclarationSyntax declaration, SyntaxKind kind) => declaration.Modifiers.Any(x => x.IsKind(kind));
+        internal static Tuple<string,string> GetFullClassName(this ClassDeclarationSyntax node)
+        {
+            return new(node.GetNamespace(), node.GetClassName());
+        }
         internal static bool ContainsAttribute(this FileScope scope, SyntaxList<AttributeListSyntax> list)
         {
             return list

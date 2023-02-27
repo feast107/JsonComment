@@ -8,15 +8,16 @@ namespace Feast.JsonAnnotation.Generators
     [Generator]
     internal class JsonAnnotationGenerator : ISourceGenerator
     {
-
+        private readonly JsonAnnotationReceiver receiver = new();
         public void Initialize(GeneratorInitializationContext context)
         {
             Debugger.Launch();
-            context.RegisterForSyntaxNotifications(() => new JsonAnnotationReceiver());
+            context.RegisterForSyntaxNotifications(() => receiver);
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
+
         }
     }
 }

@@ -4,29 +4,37 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Feast.JsonAnnotation.Extensions;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Feast.JsonAnnotation.Structs
 {
     internal readonly struct ClassScope<TClass>
     {
-        internal readonly Type Type = typeof(TClass);
-        private readonly Dictionary<string, FileScope> typeUsing = new();
+        #region Fields
         public ClassScope() { }
-        internal FileScope GetUsingSet(string filePath)
+        internal readonly Type Type = typeof(TClass);
+        internal readonly Dictionary<string, FileScope> TypeUsing = new();
+        public required Func<ClassDeclarationSyntax, FileScope, bool> WhetherDeclared { get; init; }
+        #endregion
+
+        private FileScope GetUsingSet(string filePath)
         {
-            if (!typeUsing.TryGetValue(filePath, out var namespaces))
+            if (!TypeUsing.TryGetValue(filePath, out var namespaces))
             {
                 namespaces = new(Type);
-                typeUsing[filePath] = namespaces;
+                TypeUsing[filePath] = namespaces;
             }
 
-            var res = typeUsing.FirstOrDefault(x => x.Key != filePath && !x.Value.Used);
+            var res = TypeUsing.FirstOrDefault(x => x.Key != filePath && !x.Value.Used);
             if(res.Key != default){
-                typeUsing.Remove(res.Key);
+                TypeUsing.Remove(res.Key);
             }
             return namespaces;
         }
-        public required Func<ClassDeclarationSyntax, FileScope, bool> WhetherDeclared { get; init; }
+        /// <summary>
+        /// 解析using引用
+        /// </summary>
+        /// <param name="node"></param>
         internal void ResolveUsing(SyntaxNode node)
         {
             if (node is not UsingDirectiveSyntax realNode) return; //Using 声明
@@ -42,6 +50,10 @@ namespace Feast.JsonAnnotation.Structs
                     .Identifier
                     .Text);
         }
+        /// <summary>
+        /// 解析命名空间
+        /// </summary>
+        /// <param name="node"></param>
         internal void ResolveNamespaceDeclare(SyntaxNode node)
         {
             if (node is not BaseNamespaceDeclarationSyntax realNode) return; //Namespace 声明
@@ -52,15 +64,19 @@ namespace Feast.JsonAnnotation.Structs
             if (!usingSet.HasSameNamespace(str)) return;
             usingSet.RegisterAlias(usingSet.FullName);
         }
-
+        /// <summary>
+        /// 解析类型引用
+        /// </summary>
+        /// <param name="node"></param>
         internal void ResolveClassDeclare(SyntaxNode node)
         {
             if (node is not ClassDeclarationSyntax declareNode) return;//Class 声明
             var set = GetUsingSet(node.FilePath());
-            var declared = WhetherDeclared(declareNode,set);
-            if (!declared) return;
+            if (!declareNode.Has(SyntaxKind.PartialKeyword) || //不是partial class
+                !WhetherDeclared(declareNode, set)) //不含有指定注解
+                return;
             var tuple = declareNode.GetFullClassName();
-            set.Use(tuple.Item1, tuple.Item2);
+            set.Use(tuple.Item1, declareNode);
         }
     }
 }

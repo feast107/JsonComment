@@ -5,13 +5,14 @@ using Full = Feast.JsonAnnotation;
 namespace Feast.JsonAnnotation.Run;
 
 [JsonAnnotation]
-public class BasicUsing
+public partial class BasicUsing
 {
     [Another]
-    public class SubClass
+    public partial class SubClass
     {
 
     }
+
 }
 
 [Another]
