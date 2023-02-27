@@ -1,7 +1,7 @@
-﻿using Feast.JsonAnnotation.Attributes;
-using Another = Feast.JsonAnnotation.Attributes.JsonAnnotationAttribute;
+﻿using Feast.JsonAnnotation;
+using Another = Feast.JsonAnnotation.JsonAnnotationAttribute;
 using Differ = Feast.JsonAnnotation;
-using Full = Feast.JsonAnnotation.Attributes;
+using Full = Feast.JsonAnnotation;
 
 namespace Feast.JsonAnnotation.Run
 {
@@ -11,10 +11,10 @@ namespace Feast.JsonAnnotation.Run
     [Another]
     public class AnotherNaming { }
 
-    [Feast.JsonAnnotation.Attributes.JsonAnnotation]
+    [Feast.JsonAnnotation.JsonAnnotation]
     public class FullNamespace { }
 
-    [Differ.Attributes.JsonAnnotation]
+    [Differ.JsonAnnotation]
     public class DifferedNamedSpace { }
 
     [Full.JsonAnnotation]

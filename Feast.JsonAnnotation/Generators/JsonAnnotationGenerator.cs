@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Feast.JsonAnnotation.Extensions;
+using Feast.JsonAnnotation.Structs;
 using Microsoft.CodeAnalysis;
 
 namespace Feast.JsonAnnotation.Generators
@@ -7,19 +8,11 @@ namespace Feast.JsonAnnotation.Generators
     [Generator]
     internal class JsonAnnotationGenerator : ISourceGenerator
     {
-        private class SyntaxReceiver : ISyntaxReceiver
-        {
-            public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
-            {
-                syntaxNode.ResolveUsing();
-                syntaxNode.ResolveDeclare();
-            }
-        }
 
         public void Initialize(GeneratorInitializationContext context)
         {
             Debugger.Launch();
-            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
+            context.RegisterForSyntaxNotifications(() => new JsonAnnotationReceiver());
         }
 
         public void Execute(GeneratorExecutionContext context)

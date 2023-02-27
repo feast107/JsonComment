@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Feast.JsonAnnotation.Structs
 {
-    internal readonly struct FileScopeUsing
+    internal struct FileScopeUsing
     {
         public FileScopeUsing(Type type)
         {
@@ -20,6 +21,8 @@ namespace Feast.JsonAnnotation.Structs
         public string FullName { get; }
         public Type Type { get; }
         private readonly HashSet<string> aliasSet;
+        public bool Used { get; private set; }
+        public bool Use() => Used = true;
 
         /// <summary>
         /// 是否有效声明

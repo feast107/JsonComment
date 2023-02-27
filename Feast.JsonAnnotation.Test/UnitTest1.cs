@@ -1,4 +1,4 @@
-using Feast.JsonAnnotation.Attributes;
+using Feast.JsonAnnotation;
 using Feast.JsonAnnotation.Run;
 
 namespace Feast.JsonAnnotation.Test
