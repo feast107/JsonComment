@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Feast.JsonAnnotation.Structs;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -46,17 +47,17 @@ namespace Feast.JsonAnnotation.Extensions
                     roots.Add(clazz);
                 }
             });
-            return $@"namespace { nameSpace }{{
-    {roots.FormatClassesString()}
-}}";
+            return $"namespace { nameSpace }{{\n{roots.FormatClassesString().InsertTab(1)}}}";
         }
 
         internal static string FormatNamespaceStrings(this Dictionary<string, FileScope> namespaces)
         {
             var ret = new StringBuilder();
-            foreach (var key in namespaces)
+            foreach (var c in namespaces.SelectMany(pair => pair.Value.UsingClass))
             {
+                ret.Append(c.Key.FormatNamespaceString(c.Value) + '\n');
             }
+            return ret.ToString();
         }
 
         internal static string InsertTab(this string code,int count = 1)

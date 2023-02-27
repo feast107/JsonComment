@@ -10,16 +10,16 @@ namespace Feast.JsonAnnotation.Structs
     internal class ClassTree
     {
         public required ClassDeclarationSyntax Node { get; init; }
-        public string Prefix => Node.FormatClassName() + "{\n";
-        public string Suffix => "}\n"; 
+        public string Prefix => Node.FormatClassName() + " {\n";
+        public string Suffix => "}"; 
         private List<ClassTree> Body { get; } = new();
         public string FullString(int tabCount = 0)
         {
             var sb = new StringBuilder();
             sb.Append(Prefix);
-            Body.ForEach(b => sb.Append(b.FullString(1)));
+            Body.ForEach(s => sb.Append(s.FullString(1)));
             sb.Append(Suffix);
-            return sb.ToString().InsertTab(tabCount);
+            return sb.ToString().InsertTab(tabCount) + '\n';
         }
 
         public bool IsOuterClass(ClassTree inner) => inner.Node.IsInnerClassOf(Node);

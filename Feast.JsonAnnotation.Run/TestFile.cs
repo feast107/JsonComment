@@ -8,9 +8,6 @@ namespace Feast.JsonAnnotation.Run
     [JsonAnnotation]
     public partial class BasicUsing
     {
-        /// <summary>
-        /// ???
-        /// </summary>
         [Another]
         public partial class SubClass
         {
