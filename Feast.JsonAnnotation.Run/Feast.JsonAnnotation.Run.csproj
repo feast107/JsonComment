@@ -8,9 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Feast.JsonAnnotation\Feast.JsonAnnotation.csproj"
-                      OutputItemType="Analyzer"
-                       />
+    <ProjectReference Include="..\Feast.JsonAnnotation\Feast.JsonAnnotation.csproj" OutputItemType="Analyzer" />
   </ItemGroup>
 
 </Project>

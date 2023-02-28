@@ -25,7 +25,6 @@ namespace Feast.JsonAnnotation.Extensions
             }
             return ret;
         }
-
         internal static string GetSelfClassName(this ClassDeclarationSyntax node) => node.Identifier.Text;
         internal static string GetClassName(this ClassDeclarationSyntax node)
         {

@@ -17,13 +17,13 @@ namespace Feast.JsonAnnotation.Run
     }
 
     [Another]
-    public class AnotherNaming { }
+    public partial class AnotherNaming { }
 
     [Feast.JsonAnnotation.JsonAnnotation]
     public class FullNamespace { }
 
     [Differ.JsonAnnotation]
-    public class DifferedNamedSpace { }
+    public partial class DifferedNamedSpace { }
 
     [Full.JsonAnnotation]
     public class FullNamedSpace { }

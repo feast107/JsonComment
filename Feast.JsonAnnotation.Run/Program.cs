@@ -1,14 +1,14 @@
-﻿namespace Feast.JsonAnnotation.Run
+﻿using System.Diagnostics;
+
+namespace Feast.JsonAnnotation.Run
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            _ = new BasicUsing();
-            _ = new FullNamedSpace();
-            _ = new AnotherNaming();
-            _ = new DifferedNamedSpace();
-            _ = new FullNamedSpace();
+            string str = new BasicUsing().Generate();
+            Console.WriteLine(str);
+            var fs = new StackTrace(true).GetFrame(0)!.GetFileName();
         }
     }
 }
