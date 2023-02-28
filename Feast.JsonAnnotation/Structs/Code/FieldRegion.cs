@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Feast.JsonAnnotation.Extensions;
 using System.Text;
-using Feast.JsonAnnotation.Extensions;
 
 namespace Feast.JsonAnnotation.Structs.Code
 {

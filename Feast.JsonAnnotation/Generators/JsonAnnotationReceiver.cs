@@ -8,16 +8,16 @@ namespace Feast.JsonAnnotation.Generators
     {
         public bool Generated { get; set; }
 
-        internal readonly ClassScope<JsonAnnotationAttribute> ClassUsing = new()
+        internal readonly TargetScope<JsonAnnotationAttribute> TargetUsing = new()
         {
             WhetherDeclared = (node, set) => set.ContainsAttribute(node.AttributeLists)
         };
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
-            ClassUsing.ResolveUsing(syntaxNode);
-            ClassUsing.ResolveNamespaceDeclare(syntaxNode);
-            ClassUsing.ResolveClassDeclare(syntaxNode);
+            TargetUsing.ResolveUsing(syntaxNode);
+            TargetUsing.ResolveNamespaceDeclare(syntaxNode);
+            TargetUsing.ResolveClassDeclare(syntaxNode);
         }
     }
 }

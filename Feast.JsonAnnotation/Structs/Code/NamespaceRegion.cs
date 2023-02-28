@@ -15,7 +15,7 @@ namespace Feast.JsonAnnotation.Structs.Code
         public override string ContentString(int tab = 0)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"{Namespace} {{");
+            sb.AppendLine($"namespace {Namespace} {{");
             Classes.ForEach(c =>
             {
                 sb.AppendLine(c.ContentString(DefaultTabCount));

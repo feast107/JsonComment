@@ -4,14 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Feast.JsonAnnotation.Extensions;
+using Feast.JsonAnnotation.Structs.Code;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace Feast.JsonAnnotation.Structs
 {
-    internal readonly struct ClassScope<TClass>
+    internal readonly struct TargetScope<TClass>
     {
         #region Fields
-        public ClassScope() { }
+        public TargetScope() { }
         /// <summary>
         /// Key:源文件,Value域
         /// </summary>

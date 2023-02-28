@@ -14,9 +14,6 @@ namespace Feast.JsonAnnotation.Test
         [Test]
         public void Test()
         {
-            string str = new BasicUsing().FilePath();
-            Console.WriteLine(str);
-            Assert.IsNotNull(str);
             var fs = new StackTrace(true).GetFrames();
             var file = fs.First().GetFileName();
         }

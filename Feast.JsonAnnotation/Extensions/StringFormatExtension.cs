@@ -93,13 +93,15 @@ namespace Feast.JsonAnnotation.Extensions
             builder.AppendLine($"{"\t".Repeat(tab)}{content}");
         internal static StringBuilder AppendMultipleLineWithTab(this StringBuilder builder, string content, int tab = 0)
         {
-            var contents = content.Split('\n').SkipWhile(x => x.Equals("\t"));
             var tabs = "\t".Repeat(tab);
-            contents.ForEach(c =>
+            if (content[content.Length-1] == '\n')
             {
-                builder.AppendLine($"{tabs}{c}");
-            });
-            return builder;
+                content = content.Remove(content.Length - 1, 1);
+            }
+            return builder.Append(tabs)
+            .Append(content.Replace("\n", $"\n{tabs}"))
+            .Append('\n');
+
         }
     }
 }

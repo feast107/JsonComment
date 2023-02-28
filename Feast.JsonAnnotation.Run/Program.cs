@@ -6,8 +6,7 @@ namespace Feast.JsonAnnotation.Run
     {
         static void Main(string[] args)
         {
-            string str = new BasicUsing().Generate();
-            Console.WriteLine(str);
+            JsonAnnotation.Generate();
             var fs = new StackTrace(true).GetFrame(0)!.GetFileName();
         }
     }

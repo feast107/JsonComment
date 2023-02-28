@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using System;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Feast.JsonAnnotation.Generators
 {
@@ -18,11 +19,22 @@ namespace Feast.JsonAnnotation.Generators
         {
             if (receiver.Generated) return;
             receiver.Generated = true;
-            var s = receiver.ClassUsing.TypeUsing.FormatNamespaceStrings();
-            s.ForEach(kv =>
+            var s = receiver.TargetUsing.TypeUsing.Select(x => x.Value.GenerateSourceFile());
+            s.ForEach(x =>
             {
-                context.AddSource($"{Guid.NewGuid().ToString().Replace('-', '_')}.g.cs", kv.Value);
+                context.AddSource($"{Guid.NewGuid().ToString().Replace('-', '_')}.g.cs", x);
             });
+            context.AddSource($"{nameof(JsonAnnotation)}.ext.cs",
+                $@"using System;
+
+namespace Feast.JsonAnnotation{{
+    public class JsonAnnotation{{
+        public static void Generate(){{
+            {typeof(System.Diagnostics.Debugger).FullName}.Break();
+        }}
+    }}
+}}
+");
         }
     }
 }
