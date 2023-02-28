@@ -19,12 +19,5 @@ namespace Feast.JsonAnnotation.Run
     [Another]
     public partial class AnotherNaming { }
 
-    [Feast.JsonAnnotation.JsonAnnotation]
-    public class FullNamespace { }
-
-    [Differ.JsonAnnotation]
-    public partial class DifferedNamedSpace { }
-
-    [Full.JsonAnnotation]
-    public class FullNamedSpace { }
+    
 }

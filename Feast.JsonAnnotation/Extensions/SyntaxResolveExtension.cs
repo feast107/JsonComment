@@ -62,7 +62,7 @@ namespace Feast.JsonAnnotation.Extensions
         {
             return new(node.GetNamespace(), node.GetClassName());
         }
-        internal static bool ContainsAttribute(this FileScope scope, SyntaxList<AttributeListSyntax> list)
+        internal static bool ContainsAttribute<T>(this FileScope<T> scope, SyntaxList<AttributeListSyntax> list)
         {
             return list
                 .Any(node =>

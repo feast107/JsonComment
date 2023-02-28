@@ -1,36 +1,45 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Generic;
-using System.Xml;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.IO;
 
 namespace Feast.JsonAnnotation.Structs
 {
-    internal readonly struct FileScope
+    internal readonly struct FileScope<T>
     {
-        public FileScope(Type type)
+        #region Props
+        public required string FilePath { get; init; }
+        public string Directory => Path.GetDirectoryName(FilePath);
+
+        public Type Type { get; } = typeof(T);
+
+        public string ClassName { get; } =
+            typeof(T).IsSubclassOf(typeof(Attribute))
+                ? typeof(T).Name.Replace(nameof(Attribute), string.Empty)
+                : typeof(T).Name;
+        public string Namespace { get; } = typeof(T).Namespace ?? throw new ArgumentException($"Type {typeof(T)} has no namespace");
+        public string FullName => $"{Namespace}.{ClassName}";
+
+        public bool Used => UsingClass.Count > 0;
+        #endregion
+
+        public FileScope()
         {
-            Type = type;
-            Namespace = type.Namespace ?? throw new ArgumentException($"Type {type} has no namespace");
-            ClassName = type.IsSubclassOf(typeof(Attribute))
-                ? type.Name.Replace(nameof(Attribute), string.Empty)
-                : type.Name;
-            FullName = $"{Namespace}.{ClassName}";
             aliasSet = new() { FullName };
-            UsingClass = new();
         }
+
         #region Fields
-        public string ClassName { get; }
-        public string Namespace { get; }
-        public string FullName { get; }
-        public Type Type { get; }
+
         private readonly HashSet<string> aliasSet;
 
         /// <summary>
         /// Key:命名空间,Value:类
         /// </summary>
-        internal readonly Dictionary<string,HashSet<ClassDeclarationSyntax>> UsingClass;
-        public bool Used => UsingClass.Count > 0;
+        internal readonly Dictionary<string,HashSet<ClassDeclarationSyntax>> UsingClass = new();
+
+
         #endregion
+
         private HashSet<ClassDeclarationSyntax> GetClassesByNamespace(string nameSpace)
         {
             if (UsingClass.TryGetValue(nameSpace, out var set)) return set;
@@ -38,19 +47,28 @@ namespace Feast.JsonAnnotation.Structs
             UsingClass[nameSpace] = set;
             return set;
         }
+
+        /// <summary>
+        /// 引用该类
+        /// </summary>
+        /// <param name="nameSpace"></param>
+        /// <param name="node"></param>
         public void Use(string nameSpace, ClassDeclarationSyntax node) => GetClassesByNamespace(nameSpace).Add(node);
+
         /// <summary>
         /// 是否有效声明
         /// </summary>
         /// <param name="prefix">前缀</param>
         /// <returns></returns>
         public bool IsQualifiedDeclaration(string prefix) => prefix.Equals(Type.FullName) || FullName.StartsWith(prefix);
+        
         /// <summary>
         /// 是否来自一个命名空间
         /// </summary>
         /// <param name="nameSpace"></param>
         /// <returns></returns>
         public bool HasSameNamespace(string nameSpace) => nameSpace.StartsWith(Namespace);
+
 #nullable enable
         /// <summary>
         /// 注册别名
@@ -63,6 +81,7 @@ namespace Feast.JsonAnnotation.Structs
                 : alias != null
                     ? aliasSet.Add($"{Namespace.Replace(baseName, alias)}.{ClassName}")
                     : aliasSet.Add(ClassName);
+
         /// <summary>
         /// 是否包含该声明
         /// </summary>

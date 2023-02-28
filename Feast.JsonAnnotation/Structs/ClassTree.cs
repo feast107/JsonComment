@@ -12,8 +12,8 @@ namespace Feast.JsonAnnotation.Structs
         public required ClassDeclarationSyntax Node { get; init; }
         public string Annotations { get; set; } = 
             $"/// <summary>\r\n" +
-            $"/// <include file='Document.xml' path='Document/Model[@name=\"Model\"]'/>\r\n" +
-            $"/// <include file='../../Document.xml' path='Document/Model[@name=\"Model\"]'/>\r\n" +
+            $"/// <include file='Folder/Document.xml' path='Document/Model[@name=\"Model\"]'/>\r\n" +
+            $"/// <include file='../../Folder/Document.xml' path='Document/Model[@name=\"Model\"]'/>\r\n" +
             $"/// </summary>" +
             $"\n";
 

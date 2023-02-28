@@ -12,19 +12,18 @@ namespace Feast.JsonAnnotation.Structs
     {
         #region Fields
         public ClassScope() { }
-        internal readonly Type Type = typeof(TClass);
         /// <summary>
         /// Key:源文件,Value域
         /// </summary>
-        internal readonly Dictionary<string, FileScope> TypeUsing = new();
-        public required Func<ClassDeclarationSyntax, FileScope, bool> WhetherDeclared { get; init; }
+        internal readonly Dictionary<string, FileScope<TClass>> TypeUsing = new();
+        public required Func<ClassDeclarationSyntax, FileScope<TClass>, bool> WhetherDeclared { get; init; }
         #endregion
 
-        private FileScope GetUsingSet(string filePath)
+        private FileScope<TClass> GetUsingSet(string filePath)
         {
             if (!TypeUsing.TryGetValue(filePath, out var namespaces))
             {
-                namespaces = new(Type);
+                namespaces = new() { FilePath = filePath };
                 TypeUsing[filePath] = namespaces;
             }
 
