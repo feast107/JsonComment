@@ -12,4 +12,5 @@ namespace Feast.JsonAnnotation.Run.Folder
 
     [Full.JsonAnnotation]
     public class FullNamedSpace { }
+
 }

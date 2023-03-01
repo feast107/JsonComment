@@ -34,10 +34,10 @@ namespace Feast.JsonAnnotation.Structs.Code
                 sb.AppendLineWithTab(a.ContentString(),tab);
             });
 
-            sb.AppendLineWithTab($"{Modifier.ToCodeString()} " +
-                          $"{ExtraModifiers.WithBlank(StringFormatExtension.ToCodeString)} " +
-                          $"class " +
-                          $"{ClassName} {{", tab);
+            sb.AppendLineWithTab(
+                $"{ExtraModifiers.WithBlank(StringFormatExtension.ToCodeString)}" +
+                $"class " +
+                $"{ClassName} {{", tab);
             Classes.ForEach(c =>
             {
                 sb.AppendMultipleLineWithTab(c.ContentString(DefaultTabCount), tab);

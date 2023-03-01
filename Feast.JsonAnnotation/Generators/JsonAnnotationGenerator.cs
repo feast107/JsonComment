@@ -28,9 +28,9 @@ namespace Feast.JsonAnnotation.Generators
                 $@"using System;
 
 namespace Feast.JsonAnnotation{{
-    public class JsonAnnotation{{
-        public static void Generate(){{
-            {typeof(System.Diagnostics.Debugger).FullName}.Break();
+    public class {nameof(JsonAnnotation)}{{
+        public static void {nameof(JsonAnnotation.Generate)}(){{
+            {typeof(Debugger).FullName}.{nameof(Debugger.Break)}();
         }}
     }}
 }}
