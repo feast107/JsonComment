@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace Feast.JsonAnnotation
 {
@@ -6,4 +7,5 @@ namespace Feast.JsonAnnotation
     {
         public static void Generate() { }
     }
+
 }
