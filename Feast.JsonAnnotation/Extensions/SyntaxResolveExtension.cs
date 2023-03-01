@@ -2,15 +2,17 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
+
 
 namespace Feast.JsonAnnotation.Extensions
 {
     internal static class SyntaxResolveExtension
     {
         internal static string FilePath(this SyntaxNode node) => node.SyntaxTree.FilePath;
-        internal static string GetFullUsing(this QualifiedNameSyntax node)
+        internal static string GetFullName(this QualifiedNameSyntax node)
         {
             var ret = node.Right.Identifier.Text;
             var left = node.Left;
@@ -47,9 +49,27 @@ namespace Feast.JsonAnnotation.Extensions
             var nameSpace = string.Empty;
             if (tmp is BaseNamespaceDeclarationSyntax namespaceDeclaration)
             {
-                nameSpace = ((QualifiedNameSyntax)namespaceDeclaration.Name).GetFullUsing();
+                nameSpace = ((QualifiedNameSyntax)namespaceDeclaration.Name).GetFullName();
             }
             return nameSpace;
+        }
+
+        internal static bool MayUse(this string namespacePrefix, Type type)
+        {
+            return type.FullName!.StartsWith(namespacePrefix);
+        }
+        internal static bool MayUse<TAttribute>(this string namespacePrefix)
+        where TAttribute : Attribute
+        {
+            return namespacePrefix.StartsWith(typeof(TAttribute).FullName!);
+        }
+
+        internal static List<AttributeSyntax> GetAllAttributeSyntax(this ClassDeclarationSyntax syntax)
+        {
+            var result = new List<AttributeSyntax>();
+            foreach (var x in syntax.AttributeLists) 
+                result.AddRange(x.Attributes);
+            return result.Distinct().ToList();
         }
 
         internal static bool IsInnerClassOf(this ClassDeclarationSyntax node, ClassDeclarationSyntax another)

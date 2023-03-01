@@ -10,6 +10,7 @@ namespace Feast.JsonAnnotation.Generators
 
         internal readonly TargetScope<JsonAnnotationAttribute> TargetUsing = new()
         {
+            Condition = (syntax, region) => true,
             WhetherDeclared = (node, set) => set.ContainsAttribute(node.AttributeLists)
         };
 

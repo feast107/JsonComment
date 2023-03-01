@@ -47,7 +47,7 @@ namespace Feast.JsonAnnotation.Extensions
                    
                 });
             });
-            return new FileRegion() { Namespaces = namespaces }.ContentString();
+            return new FileRegion() { Namespaces = namespaces , FilePath = ""}.ContentString();
         }
     }
 }

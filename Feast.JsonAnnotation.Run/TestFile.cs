@@ -1,14 +1,16 @@
-﻿using Another = Feast.JsonAnnotation.JsonAnnotationAttribute;
-using Differ = Feast.JsonAnnotation;
-using Full = Feast.JsonAnnotation;
+﻿using AnotherClassName = Feast.JsonAnnotation.JsonAnnotationAttribute;
+using AnotherNamespace = Feast.JsonAnnotation;
 
 namespace Feast.JsonAnnotation.Run
 {
     
     [JsonAnnotation]
+    [AnotherClassName]
+    [AnotherNamespace.JsonAnnotation]
+    [Feast.JsonAnnotation.JsonAnnotation]
     public partial class BasicUsing
     {
-        [Another]
+        [AnotherClassName]
         public partial class SubClass
         {
 
@@ -16,7 +18,7 @@ namespace Feast.JsonAnnotation.Run
 
     }
 
-    [Another]
+    [AnotherClassName]
     public partial class AnotherNaming { }
 
     

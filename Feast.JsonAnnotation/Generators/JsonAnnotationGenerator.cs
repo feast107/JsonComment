@@ -13,6 +13,7 @@ namespace Feast.JsonAnnotation.Generators
         public void Initialize(GeneratorInitializationContext context)
         {
             context.RegisterForSyntaxNotifications(() => receiver);
+            Debugger.Launch();
         }
 
         public void Execute(GeneratorExecutionContext context)

@@ -7,5 +7,4 @@ namespace Feast.JsonAnnotation
     {
         public static void Generate() { }
     }
-
 }
