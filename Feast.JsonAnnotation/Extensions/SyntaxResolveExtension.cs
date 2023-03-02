@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Feast.JsonAnnotation.Structs.Code;
 using Microsoft.CodeAnalysis.CSharp;
 
 
@@ -11,11 +12,21 @@ namespace Feast.JsonAnnotation.Extensions
 {
     internal static class SyntaxResolveExtension
     {
-        internal static string FilePath(this SyntaxNode node) => node.SyntaxTree.FilePath;
-        internal static string GetFullName(this QualifiedNameSyntax node)
+        internal static string FilePath(this SyntaxNode syntax) => syntax.SyntaxTree.FilePath;
+
+        internal static string GetNamespace(this BaseNamespaceDeclarationSyntax syntax)
         {
-            var ret = node.Right.Identifier.Text;
-            var left = node.Left;
+            return syntax.Name switch
+            {
+                IdentifierNameSyntax identifier => identifier.Identifier.Text,
+                QualifiedNameSyntax qualifiedName => qualifiedName.GetFullName(),
+                _ => string.Empty
+            };
+        }
+        internal static string GetFullName(this QualifiedNameSyntax syntax)
+        {
+            var ret = syntax.Right.Identifier.Text;
+            var left = syntax.Left;
             while (left is QualifiedNameSyntax qualified)
             {
                 ret = $"{qualified.Right.Identifier.Text}.{ret}";
@@ -27,11 +38,11 @@ namespace Feast.JsonAnnotation.Extensions
             }
             return ret;
         }
-        internal static string GetSelfClassName(this ClassDeclarationSyntax node) => node.Identifier.Text;
-        internal static string GetClassName(this ClassDeclarationSyntax node)
+        internal static string GetSelfClassName(this ClassDeclarationSyntax syntax) => syntax.Identifier.Text;
+        internal static string GetClassName(this ClassDeclarationSyntax syntax)
         {
-            var ret = node.GetSelfClassName();
-            var tmp = node.Parent;
+            var ret = syntax.GetSelfClassName();
+            var tmp = syntax.Parent;
             while (tmp is ClassDeclarationSyntax classDeclaration)
             {
                 ret = $"{classDeclaration.Identifier.Text}.{ret}";
@@ -39,9 +50,9 @@ namespace Feast.JsonAnnotation.Extensions
             }
             return ret;
         }
-        internal static string GetNamespace(this ClassDeclarationSyntax node)
+        internal static string GetNamespace(this ClassDeclarationSyntax syntax)
         {
-            var tmp = node.Parent;
+            var tmp = syntax.Parent;
             while (tmp is ClassDeclarationSyntax classDeclaration)
             {
                 tmp = classDeclaration.Parent;
@@ -72,21 +83,43 @@ namespace Feast.JsonAnnotation.Extensions
             return result.Distinct().ToList();
         }
 
-        internal static bool IsInnerClassOf(this ClassDeclarationSyntax node, ClassDeclarationSyntax another)
+        internal static bool IsDirectInnerNamespaceOf(this BaseNamespaceDeclarationSyntax syntax,
+            BaseNamespaceDeclarationSyntax another) => syntax.Parent == another;
+
+        internal static bool IsInnerNamespaceOf(this BaseNamespaceDeclarationSyntax syntax,
+            BaseNamespaceDeclarationSyntax another)
         {
-            return (another.Equals(node.Parent));
+            var parent = syntax.Parent;
+            while (parent is BaseNamespaceDeclarationSyntax par)
+            {
+                if (another.Equals(par)) return true;
+                parent = par.Parent;
+            }
+            return false;
+        }
+
+        internal static bool IsDirectInnerClassOf(this ClassDeclarationSyntax syntax, ClassDeclarationSyntax another) => syntax.Parent == another;
+        internal static bool IsInnerClassOf(this ClassDeclarationSyntax syntax, ClassDeclarationSyntax another)
+        {
+            var parent = syntax.Parent;
+            while (parent is ClassDeclarationSyntax par)
+            {
+                if (another.Equals(par)) return true;
+                parent = par.Parent;
+            }
+            return false;
         }
         internal static bool Has(this SyntaxTokenList list, SyntaxKind kind) => list.Any(x => x.IsKind(kind));
         internal static bool Has(this ClassDeclarationSyntax declaration, SyntaxKind kind) => declaration.Modifiers.Any(x => x.IsKind(kind));
-        internal static Tuple<string,string> GetFullClassName(this ClassDeclarationSyntax node)
+        internal static Tuple<string,string> GetFullClassName(this ClassDeclarationSyntax syntax)
         {
-            return new(node.GetNamespace(), node.GetClassName());
+            return new(syntax.GetNamespace(), syntax.GetClassName());
         }
         internal static bool ContainsAttribute<T>(this FileScope<T> scope, SyntaxList<AttributeListSyntax> list)
         {
             return list
-                .Any(node =>
-                    node
+                .Any(syntax =>
+                    syntax
                         .Attributes
                         .Any(attr => attr.Name switch
                         {
