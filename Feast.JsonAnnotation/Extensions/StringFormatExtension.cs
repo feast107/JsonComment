@@ -73,8 +73,10 @@ namespace Feast.JsonAnnotation.Extensions
             var head = str[0];
             return head is >= 'A' and <= 'Z' ? $"{(char)(head + 32)}{str.Substring(1)}" : str;
         }
-        internal static string ToCodeString(this CodeRegion.AccessModifier modifer) => modifer.ToString().ToCodeString();
-        internal static string ToCodeString(this CodeRegion.ExtraModifier modifer) => modifer.ToString().ToCodeString();
+        internal static string ToCodeString(this CodeRegion.AccessModifier modifer)
+            => modifer.ToString().ToCodeString();
+        internal static string ToCodeString(this CodeRegion.ExtraModifier modifer)
+            => modifer.ToString().ToCodeString();
 
         internal static string WithBlank<T>(this List<T> source, int count = 1)
         {
@@ -87,6 +89,11 @@ namespace Feast.JsonAnnotation.Extensions
             var sb = new StringBuilder();
             source.ForEach(x => sb.Append(formatProvider(x) + " ".Repeat(count)));
             return sb.ToString();
+        }
+
+        internal static string WithoutAttribute(this string className)
+        {
+            return className.EndsWith(nameof(Attribute)) ? className.Remove(className.Length - 9, 9) : className;
         }
 
         internal static StringBuilder AppendLineWithTab(this StringBuilder builder, string content, int tab = 0) =>
