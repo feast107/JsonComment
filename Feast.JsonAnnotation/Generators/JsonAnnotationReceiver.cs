@@ -1,4 +1,5 @@
 ﻿using Feast.JsonAnnotation.Extensions;
+using Feast.JsonAnnotation.Filters;
 using Feast.JsonAnnotation.Structs;
 using Microsoft.CodeAnalysis;
 
@@ -8,17 +9,9 @@ namespace Feast.JsonAnnotation.Generators
     {
         public bool Generated { get; set; }
 
-        internal readonly TargetScope<JsonAnnotationAttribute> TargetUsing = new()
-        {
-            Condition = (syntax, region) => true,
-            WhetherDeclared = (node, set) => set.ContainsAttribute(node.AttributeLists)
-        };
-
+        
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
-            TargetUsing.ResolveUsing(syntaxNode);
-            TargetUsing.ResolveNamespaceDeclare(syntaxNode);
-            TargetUsing.ResolveClassDeclare(syntaxNode);
         }
     }
 }
