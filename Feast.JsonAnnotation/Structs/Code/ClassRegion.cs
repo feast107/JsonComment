@@ -1,30 +1,59 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Feast.JsonAnnotation.Extensions;
+using Feast.JsonAnnotation.Filters;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Feast.JsonAnnotation.Structs.Code
 {
-    internal class ClassRegion : CodeRegion
+    internal class ClassRegion<TFilter> : CodeRegion<TFilter>
+        where TFilter : ISyntaxFilter<TFilter>
     {
-        public required ClassDeclarationSyntax Class { get; init; }
+        public required ClassDeclarationSyntax Class
+        {
+            get => syntax;
+            init
+            {
+                syntax = value;
+                syntax.Members.ForEach(x =>
+                {
+                    switch (x)
+                    {
+                        case ClassDeclarationSyntax clz:
+                            if (!Filter.QualifiedClass(clz, Context(clz))) break;
+                            Classes.Add(new ()
+                            {
+                                Class = clz,
+                            });
+                            break;
+                        case PropertyDeclarationSyntax property:
+                            /*Properties.Add(new PropertyRegion()
+                            {
+                                Property = property
+                            });*/
+                            break;
+                    }
+                });
+            }
+        }
 
-        public required string ClassName { get; init; }
+        private readonly ClassDeclarationSyntax syntax;
 
-        public AccessModifier Modifier { get; set; } = AccessModifier.Public;
+        public CodeRegion.AccessModifier Modifier { get; set; } = CodeRegion.AccessModifier.Public;
 
-        public List<ExtraModifier> ExtraModifiers { get; set; } = new() { ExtraModifier.Partial };
+        public List<CodeRegion.ExtraModifier> ExtraModifiers { get; set; } = new() { CodeRegion.ExtraModifier.Partial };
 
-        public List<AnnotationRegion> Annotations { get; set; } = new();
+        public List<AnnotationRegion<TFilter>> Annotations { get; set; } = new();
 
-        public List<ClassRegion> Classes { get; set; } = new();
+        public List<ClassRegion<TFilter>> Classes { get; set; } = new();
 
-        public List<MethodRegion> Methods { get; set; } = new();
+        public List<MethodRegion<TFilter>> Methods { get; set; } = new();
 
-        public List<PropertyRegion> Properties { get; set; } = new();
+        public List<PropertyRegion<TFilter>> Properties { get; set; } = new();
 
-        public List<FieldRegion> Fields { get; set; } = new();
+        public List<FieldRegion<TFilter>> Fields { get; set; } = new();
 
         public override string ContentString(int tab = 0)
         {
@@ -37,7 +66,7 @@ namespace Feast.JsonAnnotation.Structs.Code
             sb.AppendLineWithTab(
                 $"{ExtraModifiers.WithBlank(StringFormatExtension.ToCodeString)}" +
                 $"class " +
-                $"{ClassName} {{", tab);
+                $"{Class.GetSelfClassName()} {{", tab);
             Classes.ForEach(c =>
             {
                 sb.AppendMultipleLineWithTab(c.ContentString(DefaultTabCount), tab);
@@ -59,5 +88,6 @@ namespace Feast.JsonAnnotation.Structs.Code
 
             return sb.ToString();
         }
+
     }
 }
