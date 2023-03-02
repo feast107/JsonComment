@@ -3,12 +3,15 @@ using Feast.JsonAnnotation.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Feast.JsonAnnotation.Filters;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Feast.JsonAnnotation.Structs.Code
 {
-    internal class FileRegion : CodeRegion
+    internal class FileRegion<TFilter> : CodeRegion<TFilter>
+        where TFilter : ISyntaxFilter<TFilter>
     {
+
         public required string FilePath { get; set; }
 
         public List<string> UsingNamespaces { get; set; } = new()
@@ -18,7 +21,7 @@ namespace Feast.JsonAnnotation.Structs.Code
 
         public Dictionary<string,string> AliasUsingNamespaces { get; set; } = new();
 
-        public List<NamespaceRegion> Namespaces { get; set; } = new();
+        public List<NamespaceRegion<TFilter>> Namespaces { get; set; } = new();
 
         /// <summary>
         /// Using命名空间
@@ -26,15 +29,17 @@ namespace Feast.JsonAnnotation.Structs.Code
         /// <param name="syntax"></param>
         public void UsingNamespace(UsingDirectiveSyntax syntax)
         {
+            if (syntax.Name is not QualifiedNameSyntax nameSyntax) return;
+            var name = nameSyntax.GetFullName();
             if (syntax.Alias is not null && !AliasUsingNamespaces.ContainsKey(syntax.Alias.Name.Identifier.Text))
             {
                 AliasUsingNamespaces.Add(
                     syntax.Alias.Name.Identifier.Text,
-                    (syntax.Name as QualifiedNameSyntax).GetFullName());
+                    name.WithoutAttribute());
             }
             else
             {
-                UsingNamespaces.Add((syntax.Name as QualifiedNameSyntax).GetFullName());
+                UsingNamespaces.Add(name);
             }
         }
 
@@ -44,28 +49,16 @@ namespace Feast.JsonAnnotation.Structs.Code
         /// <param name="syntax"></param>
         public void DeclareNamespace(BaseNamespaceDeclarationSyntax syntax)
         {
-            var nameSpace = (syntax.Name as QualifiedNameSyntax).GetFullName();
-            if (Namespaces.Any(x => x.Namespace == nameSpace))
+            if (Namespaces.Any(x => x.Namespace == syntax || x.TryAddNamespace(syntax)))
             {
                 return;
             }
-            Namespaces.Add(new() { Namespace = nameSpace });
+            Namespaces.Add(new()
+            {
+                Namespace = syntax,
+            });
         }
 
-        /// <summary>
-        /// 在当前文件中能否引用到目标类型
-        /// </summary>
-        /// <param name="syntax">提供的命名节点</param>
-        /// <param name="targetNamespace">目标的命名空间</param>
-        /// <param name="targetClassname">目标的类型</param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public bool CanReferenceTo(QualifiedNameSyntax syntax,string targetNamespace,string targetClassname)
-        {
-            var name = syntax.GetFullName();
-            if (UsingNamespaces.Any(n => n == name)) return true;
-            throw new NotImplementedException();
-        }
         public override string ContentString(int tab = 0)
         {
             var sb = new StringBuilder();
@@ -87,5 +80,9 @@ namespace Feast.JsonAnnotation.Structs.Code
 
             return sb.ToString();
         }
+
+
     }
+
+    
 }
