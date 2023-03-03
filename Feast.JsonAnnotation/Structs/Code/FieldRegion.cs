@@ -5,7 +5,7 @@ using System.Text;
 namespace Feast.JsonAnnotation.Structs.Code
 {
     internal class FieldRegion<TFilter> : CodeRegion<TFilter> 
-        where TFilter : ISyntaxFilter<TFilter>
+        where TFilter : SyntaxFilter<TFilter>
     {
         public CodeRegion.AccessModifier Modifier { get; set; }
 

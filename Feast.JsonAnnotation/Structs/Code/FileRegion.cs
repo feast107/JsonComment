@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Feast.JsonAnnotation.Structs.Code
 {
     internal class FileRegion<TFilter> : CodeRegion<TFilter>
-        where TFilter : ISyntaxFilter<TFilter>
+        where TFilter : SyntaxFilter<TFilter>
     {
         public required string FilePath { get; set; }
 
@@ -61,6 +61,7 @@ namespace Feast.JsonAnnotation.Structs.Code
 
         public override string ContentString(int tab = 0)
         {
+            Filter.BeforeGenerateDoc(this);
             var sb = new StringBuilder();
             UsingNamespaces.ForEach(n =>
             {

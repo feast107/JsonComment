@@ -8,7 +8,7 @@ using System.Linq;
 namespace Feast.JsonAnnotation.Structs.Code
 {
     internal class ProgramRegion<TFilter> : CodeRegion<TFilter>
-    where TFilter : ISyntaxFilter<TFilter>
+    where TFilter : SyntaxFilter<TFilter>
     {
         private Dictionary<string, FileRegion<TFilter>> Contexts { get; } = new();
         public FileRegion<TFilter> GetContext(SyntaxNode node) => GetContext(node.SyntaxTree.FilePath);

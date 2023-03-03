@@ -5,7 +5,7 @@ using Feast.JsonAnnotation.Filters;
 namespace Feast.JsonAnnotation.Structs.Code
 {
     internal class PropertyRegion<TFilter> : CodeRegion<TFilter>
-        where TFilter : ISyntaxFilter<TFilter>
+        where TFilter : SyntaxFilter<TFilter>
     {
         public required PropertyDeclarationSyntax Property { get; init; }
 

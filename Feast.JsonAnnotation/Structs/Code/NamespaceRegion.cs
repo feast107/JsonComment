@@ -8,9 +8,9 @@ using Feast.JsonAnnotation.Filters;
 namespace Feast.JsonAnnotation.Structs.Code
 {
     internal class NamespaceRegion<TFilter> : CodeRegion<TFilter>
-        where TFilter : ISyntaxFilter<TFilter>
+        where TFilter : SyntaxFilter<TFilter>
     {
-        private FileRegion<TFilter> File { get; init; }
+        private FileRegion<TFilter> File { get; }
 
         public NamespaceRegion(FileRegion<TFilter> file)
         {
