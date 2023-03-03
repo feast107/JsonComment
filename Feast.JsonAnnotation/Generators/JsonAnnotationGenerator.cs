@@ -25,6 +25,7 @@ namespace Feast.JsonAnnotation.Generators
             {
                 context.AddSource($"{Guid.NewGuid().ToString().Replace('-', '_')}.g.cs", x.Value);
             });
+            
             context.AddSource($"{nameof(JsonAnnotation)}.ext.cs",
                 $@"using System;
 

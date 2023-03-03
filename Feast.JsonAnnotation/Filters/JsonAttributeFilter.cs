@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Feast.JsonAnnotation.Filters
 {
-    internal class JsonAttributeFilter : ISyntaxFilter<JsonAttributeFilter>, ISyntaxReceiver
+    internal class JsonAttributeFilter : SyntaxFilter<JsonAttributeFilter>, ISyntaxReceiver
     {
         public static JsonAttributeFilter Instance { get; } = new();
         private JsonAttributeFilter()
@@ -20,7 +20,7 @@ namespace Feast.JsonAnnotation.Filters
         private string AttributeNamespace { get; } = typeof(JsonAnnotationAttribute).Namespace;
         private string FullAttributeName { get; } = typeof(JsonAnnotationAttribute).FullName.WithoutAttribute();
 
-        public bool QualifiedClass(ClassDeclarationSyntax syntax, FileRegion<JsonAttributeFilter> context)
+        public override bool QualifiedClass(ClassDeclarationSyntax syntax, FileRegion<JsonAttributeFilter> context)
         {
             if (!syntax.Modifiers.Has(SyntaxKind.PartialKeyword)) return false;
             return syntax.GetAllAttributeSyntax().Any(x =>
@@ -34,16 +34,7 @@ namespace Feast.JsonAnnotation.Filters
             });
         }
 
-        public bool QualifiedNamespace(BaseNamespaceDeclarationSyntax syntax, FileRegion<JsonAttributeFilter> context)
-        {
-            return true;
-        }
-
-        public void PostClassDeclaration(ClassRegion<JsonAttributeFilter> target)
-        {
-        }
-
-        public void PostNamespaceDeclaration(NamespaceRegion<JsonAttributeFilter> target)
+        public override void BeforeGenerateDoc(FileRegion<JsonAttributeFilter> target)
         {
         }
 
@@ -51,6 +42,7 @@ namespace Feast.JsonAnnotation.Filters
         {
             CodeRegion<JsonAttributeFilter>.Program.AnalyzeSyntax(syntaxNode);
         }
+
 
         public bool Generated => results != null;
 

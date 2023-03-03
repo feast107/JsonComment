@@ -150,7 +150,7 @@ namespace Feast.JsonAnnotation.Extensions
         internal static ClassRegion<TFilter> PostAction<TFilter>(
             this ClassRegion<TFilter> region, 
             Action<ClassRegion<TFilter>> action) 
-            where TFilter : ISyntaxFilter<TFilter>
+            where TFilter : SyntaxFilter<TFilter>
         {
             action(region);
             return region;
@@ -159,7 +159,7 @@ namespace Feast.JsonAnnotation.Extensions
         internal static NamespaceRegion<TFilter> PostAction<TFilter>(
             this NamespaceRegion<TFilter> region,
             Action<NamespaceRegion<TFilter>> action)
-            where TFilter : ISyntaxFilter<TFilter>
+            where TFilter : SyntaxFilter<TFilter>
         {
             action(region);
             return region;
