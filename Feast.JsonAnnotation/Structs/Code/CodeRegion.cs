@@ -43,8 +43,6 @@ namespace Feast.JsonAnnotation.Structs.Code
     {
         public static TFilter Filter { get; set; } 
         public static ProgramRegion<TFilter> Program { get; } = new();   
-        protected FileRegion<TFilter> Context(SyntaxNode node) => Program.GetContext(node);
-
         public abstract string ContentString(int tab = 0);
         public virtual int DefaultTabCount { get; set; } = 1;
     }
