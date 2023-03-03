@@ -12,11 +12,11 @@ namespace Feast.JsonAnnotation.Structs.Code
     {
         private Dictionary<string, FileRegion<TFilter>> Contexts { get; } = new();
         public FileRegion<TFilter> GetContext(SyntaxNode node) => GetContext(node.SyntaxTree.FilePath);
-        protected FileRegion<TFilter> GetContext(string filePath)
+        private FileRegion<TFilter> GetContext(string filePath)
         {
             if (Program.Contexts.TryGetValue(filePath, out var context)) return context;
             context = new() { FilePath = filePath };
-            Program.Contexts[filePath] = context;
+            Program.Contexts.Add(filePath, context);
             return context;
         }
 
@@ -39,6 +39,15 @@ namespace Feast.JsonAnnotation.Structs.Code
         }
 
         public Dictionary<string, string> ContentStrings =>
-            Contexts.Where(x=>x.Value.Namespaces.Count > 0).ToDictionary(k => k.Key, v => v.Value.ContentString());
+            Contexts.Where(x=>
+                {
+                    if(x.Value.Namespaces.Count == 0) { return false; }
+
+                    x.Value.Namespaces.RemoveAll(n => n.Classes.Count == 0 &&
+                                                      n.Namespaces.Count == 0);
+                    return x.Value.Namespaces.Count != 0;
+                })
+                .ToDictionary(k => 
+                    k.Key, v => v.Value.ContentString());
     }
 }
