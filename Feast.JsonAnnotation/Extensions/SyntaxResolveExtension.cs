@@ -4,6 +4,8 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using Feast.JsonAnnotation.Filters;
 using Feast.JsonAnnotation.Structs.Code;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -14,7 +16,7 @@ namespace Feast.JsonAnnotation.Extensions
     {
         internal static string FilePath(this SyntaxNode syntax) => syntax.SyntaxTree.FilePath;
 
-        internal static string GetNamespace(this BaseNamespaceDeclarationSyntax syntax)
+        internal static string GetShortNamespace(this BaseNamespaceDeclarationSyntax syntax)
         {
             return syntax.Name switch
             {
@@ -60,9 +62,27 @@ namespace Feast.JsonAnnotation.Extensions
             var nameSpace = string.Empty;
             if (tmp is BaseNamespaceDeclarationSyntax namespaceDeclaration)
             {
-                nameSpace = ((QualifiedNameSyntax)namespaceDeclaration.Name).GetFullName();
+                nameSpace = namespaceDeclaration.GetFullNamespace();
             }
             return nameSpace;
+        }
+
+        public static string GetFullNamespace(this BaseNamespaceDeclarationSyntax syntax)
+        {
+            SyntaxNode tmp = syntax;
+#nullable enable
+            string? ret = null;
+            while ((tmp as BaseNamespaceDeclarationSyntax)?.Name is IdentifierNameSyntax identifier)
+            {
+                ret = ret == null ? identifier.Identifier.Text : $"{identifier.Identifier.Text}.{ret}";
+                tmp = tmp.Parent;
+            }
+            ret ??= "";
+            if ((tmp as BaseNamespaceDeclarationSyntax)?.Name is QualifiedNameSyntax name)
+            {
+                ret = $"{name.GetFullName()}.{ret}";
+            }
+            return ret;
         }
 
         internal static bool MayUse(this string namespacePrefix, Type type)
@@ -81,6 +101,16 @@ namespace Feast.JsonAnnotation.Extensions
             foreach (var x in syntax.AttributeLists) 
                 result.AddRange(x.Attributes);
             return result.Distinct().ToList();
+        }
+
+        internal static string GetName(this AttributeSyntax syntax)
+        {
+            return (syntax.Name) switch
+            {
+                QualifiedNameSyntax qa => qa.GetFullName(),
+                IdentifierNameSyntax ia => ia.Identifier.Text,
+                _ => throw new NotSupportedException()
+            };
         }
 
         internal static bool IsDirectInnerNamespaceOf(this BaseNamespaceDeclarationSyntax syntax,
@@ -115,19 +145,24 @@ namespace Feast.JsonAnnotation.Extensions
         {
             return new(syntax.GetNamespace(), syntax.GetClassName());
         }
-        internal static bool ContainsAttribute<T>(this FileScope<T> scope, SyntaxList<AttributeListSyntax> list)
+
+
+        internal static ClassRegion<TFilter> PostAction<TFilter>(
+            this ClassRegion<TFilter> region, 
+            Action<ClassRegion<TFilter>> action) 
+            where TFilter : ISyntaxFilter<TFilter>
         {
-            return list
-                .Any(syntax =>
-                    syntax
-                        .Attributes
-                        .Any(attr => attr.Name switch
-                        {
-                            QualifiedNameSyntax syntax => scope.HasAttribute(syntax.Right.Identifier.Text),
-                            IdentifierNameSyntax syntax => scope.HasAttribute(syntax.Identifier.Text),
-                            _ => false,
-                        })
-                );
+            action(region);
+            return region;
+        }
+
+        internal static NamespaceRegion<TFilter> PostAction<TFilter>(
+            this NamespaceRegion<TFilter> region,
+            Action<NamespaceRegion<TFilter>> action)
+            where TFilter : ISyntaxFilter<TFilter>
+        {
+            action(region);
+            return region;
         }
     }
 }
