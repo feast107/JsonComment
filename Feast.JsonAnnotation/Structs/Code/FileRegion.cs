@@ -11,7 +11,6 @@ namespace Feast.JsonAnnotation.Structs.Code
     internal class FileRegion<TFilter> : CodeRegion<TFilter>
         where TFilter : ISyntaxFilter<TFilter>
     {
-
         public required string FilePath { get; set; }
 
         public List<string> UsingNamespaces { get; set; } = new()
@@ -37,7 +36,7 @@ namespace Feast.JsonAnnotation.Structs.Code
                     syntax.Alias.Name.Identifier.Text,
                     name.WithoutAttribute());
             }
-            else
+            else if(UsingNamespaces.All(x => x != name))
             {
                 UsingNamespaces.Add(name);
             }
@@ -49,11 +48,12 @@ namespace Feast.JsonAnnotation.Structs.Code
         /// <param name="syntax"></param>
         public void DeclareNamespace(BaseNamespaceDeclarationSyntax syntax)
         {
+            if (!Filter.QualifiedNamespace(syntax, this)) return ;
             if (Namespaces.Any(x => x.Namespace == syntax || x.TryAddNamespace(syntax)))
             {
                 return;
             }
-            Namespaces.Add(new()
+            Namespaces.Add(new (this)
             {
                 Namespace = syntax,
             });
@@ -80,7 +80,6 @@ namespace Feast.JsonAnnotation.Structs.Code
 
             return sb.ToString();
         }
-
 
     }
 
