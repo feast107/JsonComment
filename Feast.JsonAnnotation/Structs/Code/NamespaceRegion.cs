@@ -10,6 +10,13 @@ namespace Feast.JsonAnnotation.Structs.Code
     internal class NamespaceRegion<TFilter> : CodeRegion<TFilter>
         where TFilter : ISyntaxFilter<TFilter>
     {
+        private FileRegion<TFilter> File { get; init; }
+
+        public NamespaceRegion(FileRegion<TFilter> file)
+        {
+            File = file;
+        }
+
         public required BaseNamespaceDeclarationSyntax Namespace
         {
             get => syntaxInternal;
@@ -21,21 +28,22 @@ namespace Feast.JsonAnnotation.Structs.Code
                     switch (x)
                     {
                         case ClassDeclarationSyntax clz:
-                            if (!Filter.QualifiedClass(clz, Context(clz))) break;
-                            Classes.Add(new ()
+                            if (!Filter.QualifiedClass(clz, File)) break;
+                            Classes.Add(new (File)
                             {
                                 Class = clz,
                             });
                             break;
                         case BaseNamespaceDeclarationSyntax ns:
-                            if (!Filter.QualifiedNamespace(ns, Context(ns))) break;
-                            Namespaces.Add(new ()
+                            if (!Filter.QualifiedNamespace(ns, File)) break;
+                            Namespaces.Add(new (File)
                             {
-                                Namespace = ns
+                                Namespace = ns,
                             });
                             break;
                     };
                 });
+                this.PostAction(Filter.PostNamespaceDeclaration);
             }
         }
 
@@ -48,14 +56,14 @@ namespace Feast.JsonAnnotation.Structs.Code
         public override string ContentString(int tab = 0)
         {
             var sb = new StringBuilder();
-            sb.AppendLineWithTab($"namespace {(Namespace.GetNamespace())} {{", tab);
+            sb.AppendLineWithTab($"namespace {(Namespace.GetShortNamespace())} {{", tab);
             Classes.ForEach(c =>
             {
-                sb.AppendLineWithTab(c.ContentString(DefaultTabCount), tab);
+                sb.AppendMultipleLineWithTab(c.ContentString(DefaultTabCount), tab);
             });
             Namespaces.ForEach(n =>
             {
-                sb.AppendLineWithTab(n.ContentString(DefaultTabCount), tab);
+                sb.AppendMultipleLineWithTab(n.ContentString(DefaultTabCount), tab);
             });
             sb.AppendLineWithTab("}", tab);
             return sb.ToString();
@@ -63,11 +71,10 @@ namespace Feast.JsonAnnotation.Structs.Code
 
         public bool TryAddNamespace(BaseNamespaceDeclarationSyntax syntax)
         {
-            if (!Filter.QualifiedNamespace(syntax, Context(syntax))) return false;
             if (Namespace == syntax) return true;
             if (syntax.IsDirectInnerNamespaceOf(Namespace) && Namespaces.All(n => n.Namespace != syntax))
             {
-                Namespaces.Add(new() { Namespace = syntax });
+                Namespaces.Add(new(File) { Namespace = syntax });
                 return true;
             }
             return Namespaces.Any(n => n.TryAddNamespace(syntax));
