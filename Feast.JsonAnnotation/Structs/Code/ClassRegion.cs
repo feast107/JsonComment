@@ -11,6 +11,13 @@ namespace Feast.JsonAnnotation.Structs.Code
     internal class ClassRegion<TFilter> : CodeRegion<TFilter>
         where TFilter : ISyntaxFilter<TFilter>
     {
+        private FileRegion<TFilter> File { get; }
+
+        public ClassRegion(FileRegion<TFilter> file)
+        {
+            File = file;
+        }
+
         public required ClassDeclarationSyntax Class
         {
             get => syntax;
@@ -22,8 +29,8 @@ namespace Feast.JsonAnnotation.Structs.Code
                     switch (x)
                     {
                         case ClassDeclarationSyntax clz:
-                            if (!Filter.QualifiedClass(clz, Context(clz))) break;
-                            Classes.Add(new ()
+                            if (!Filter.QualifiedClass(clz, File)) break;
+                            Classes.Add(new (File)
                             {
                                 Class = clz,
                             });
@@ -36,6 +43,7 @@ namespace Feast.JsonAnnotation.Structs.Code
                             break;
                     }
                 });
+                this.PostAction(Filter.PostClassDeclaration);
             }
         }
 
@@ -45,7 +53,10 @@ namespace Feast.JsonAnnotation.Structs.Code
 
         public List<CodeRegion.ExtraModifier> ExtraModifiers { get; set; } = new() { CodeRegion.ExtraModifier.Partial };
 
-        public List<AnnotationRegion<TFilter>> Annotations { get; set; } = new();
+        public List<AnnotationRegion<TFilter>> Annotations { get; set; } = new()
+        {
+            new AnnotationRegion<TFilter>()
+        };
 
         public List<ClassRegion<TFilter>> Classes { get; set; } = new();
 
@@ -60,7 +71,7 @@ namespace Feast.JsonAnnotation.Structs.Code
             var sb = new StringBuilder();
             Annotations.ForEach(a =>
             {
-                sb.AppendLineWithTab(a.ContentString(),tab);
+                sb.AppendMultipleLineWithTab(a.ContentString(),tab);
             });
 
             sb.AppendLineWithTab(
