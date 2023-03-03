@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Linq;
+using Feast.JsonAnnotation.Generators;
 
 namespace Feast.JsonAnnotation.Filters
 {
@@ -36,6 +37,7 @@ namespace Feast.JsonAnnotation.Filters
 
         public override void BeforeGenerateDoc(FileRegion<JsonAttributeFilter> target)
         {
+            XmlDocumentGenerator.MapFile(target);
         }
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)

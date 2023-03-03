@@ -5,33 +5,28 @@ using System.Text;
 using System.Xml;
 using Feast.JsonAnnotation.Filters;
 using Feast.JsonAnnotation.Structs.Code;
+using Feast.JsonAnnotation.Structs.Doc;
+using XmlGenerateExtension = Feast.JsonAnnotation.Extensions.XmlGenerateExtension;
 
 namespace Feast.JsonAnnotation.Generators
 {
     internal class XmlDocumentGenerator
     {
-        private XmlDocument Document { get; } = new();
+        public XmlDocument Document { get; } = new();
 
-        public string Root { get; init; } = nameof(Document);
+        public XmlNodeConfig Config { get; init; } = new()
+        {
+            Root = nameof(Document),
+            Class = "Class",
+            Namespace = "Namespace"
+        };
 
-        public string Namespace { get; init; } = nameof(Namespace);
-
-        public string Class { get; init; } = nameof(Class);
-
-        public static XmlDocumentGenerator FromFile<TFilter>(FileRegion<TFilter> region) 
+        public static XmlDocumentGenerator MapFile<TFilter>(FileRegion<TFilter> region) 
             where TFilter : SyntaxFilter<TFilter>
         {
-            
             XmlDocumentGenerator ret = new();
-            region.Namespaces.ForEach(x =>
-            {
-                ret.MapNode();
-            });
-        }
-
-        private void MapNode()
-        {
-            Document.CreateElement(Root,"");
+            XmlGenerateExtension.Map(ret.Document,region,ret.Config);
+            return ret;
         }
     }
 }
