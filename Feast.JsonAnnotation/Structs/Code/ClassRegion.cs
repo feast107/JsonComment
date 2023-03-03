@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Feast.JsonAnnotation.Structs.Code
 {
     internal class ClassRegion<TFilter> : CodeRegion<TFilter>
-        where TFilter : ISyntaxFilter<TFilter>
+        where TFilter : SyntaxFilter<TFilter>
     {
         private FileRegion<TFilter> File { get; }
 
@@ -102,3 +102,4 @@ namespace Feast.JsonAnnotation.Structs.Code
 
     }
 }
+ 

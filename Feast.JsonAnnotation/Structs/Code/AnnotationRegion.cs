@@ -6,7 +6,7 @@ using Feast.JsonAnnotation.Filters;
 namespace Feast.JsonAnnotation.Structs.Code
 {
     internal class AnnotationRegion<TFilter> : CodeRegion<TFilter>
-        where TFilter : ISyntaxFilter<TFilter>
+        where TFilter : SyntaxFilter<TFilter>
     {
         public List<string> Annotations = new();
         public override string ContentString(int tab = 0)

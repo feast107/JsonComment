@@ -39,7 +39,7 @@ namespace Feast.JsonAnnotation.Structs.Code
 
 
     internal abstract class CodeRegion<TFilter> 
-        where TFilter : ISyntaxFilter<TFilter>
+        where TFilter : SyntaxFilter<TFilter>
     {
         public static TFilter Filter { get; set; } 
         public static ProgramRegion<TFilter> Program { get; } = new();   
