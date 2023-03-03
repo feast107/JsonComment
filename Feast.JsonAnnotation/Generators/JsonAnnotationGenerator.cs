@@ -13,8 +13,8 @@ namespace Feast.JsonAnnotation.Generators
         private readonly JsonAttributeFilter receiver = JsonAttributeFilter.Instance;
         public void Initialize(GeneratorInitializationContext context)
         {
-            context.RegisterForSyntaxNotifications(() => receiver);
             Debugger.Launch();
+            context.RegisterForSyntaxNotifications(() => receiver);
         }
 
         public void Execute(GeneratorExecutionContext context)
