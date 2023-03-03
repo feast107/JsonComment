@@ -1,6 +1,6 @@
 ﻿using Feast.JsonAnnotation.Extensions;
-using System.Text;
 using Feast.JsonAnnotation.Filters;
+using System.Text;
 
 namespace Feast.JsonAnnotation.Structs.Code
 {
