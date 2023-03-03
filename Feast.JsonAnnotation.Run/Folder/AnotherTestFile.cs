@@ -9,19 +9,16 @@ namespace Feast.JsonAnnotation.Run.Folder
         [Feast.JsonAnnotation.JsonAnnotation]
         [JsonAnnotation]
         [Another]
-        public class InnerClass { }
+        public partial class InnerClass
+        {
+        }
     }
 
     [Feast.JsonAnnotation.JsonAnnotation]
     [JsonAnnotation]
     [Another]
     [Differ.JsonAnnotation]
-    public class FullNamespace { }
-
-    [Differ.JsonAnnotation]
-    public partial class DifferedNamedSpace { }
-
-    [Full.JsonAnnotation]
-    public class FullNamedSpace { }
-
+    public class FullNamespace
+    {
+    }
 }
