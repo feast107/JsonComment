@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using Feast.JsonAnnotation.Extensions;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Feast.JsonAnnotation.Structs.Doc
 {
@@ -14,14 +15,9 @@ namespace Feast.JsonAnnotation.Structs.Doc
             Element = document.DocumentElement,
             Document = document
         };
-        private XmlNodeField()
-        {
-            
-        }
+        private XmlNodeField() { }
         public required XmlDocument Document { get; init; }
         public required XmlElement Element { get; init; }
-
-
 #nullable enable
         public XmlNodeField? Parent { get; init; }
 
@@ -30,6 +26,8 @@ namespace Feast.JsonAnnotation.Structs.Doc
         public string Tag => Element.Name;
 
         public string Name => Element.GetAttribute("name");
+
+        private string? cache;
         private XmlElement CreateChildElement(string tag,string name)
         {
             var ret = Document.CreateElement(tag);
@@ -69,6 +67,31 @@ namespace Feast.JsonAnnotation.Structs.Doc
                 ? $"{documentVariable}.{nameof(XmlDocument.DocumentElement)}"
                 : $"{documentVariable}.{nameof(XmlDocument.SelectSingleNode)}(\"{ToCodePath().Replace("\"","\\\"")}\")";
 
+        public string SetJsonProvider(string jsonGenerateCode) =>
+            cache = GetGenerateCode().Replace("[provider]", jsonGenerateCode)
+                    ?? throw new NullReferenceException("Code hadn't been generate");
+
+        public string GetGenerateCode()
+        {
+            return cache ??= Parent != null
+                ? $@"
+new {nameof(Action)}<{nameof(String)}>((codeString) =>
+{{
+    if( [document].{nameof(XmlDocument.SelectSingleNode)}(""{Parent.ReplaceForCode}"") == null ) throw new {nameof(ArgumentNullException)}(""Parent node not exist""); //Parent node not exist
+    if( [document].{nameof(XmlDocument.SelectSingleNode)}(""{ReplaceForCode}"") != null ) return; //Already generated
+    var tmp = [document].{nameof(XmlDocument.CreateElement)}(""{Tag}"");
+    tmp.{nameof(XmlElement.SetAttribute)}(""name"", ""{Name}"");
+    var code = [document].{nameof(XmlDocument.CreateElement)}(""code"");
+    code.{nameof(XmlNode.InnerText)} = codeString;
+    tmp.{nameof(XmlNode.AppendChild)}(code);
+    [document].{nameof(XmlDocument.SelectSingleNode)}(""{Parent.ReplaceForCode}"")?.{nameof(XmlNode.AppendChild)}(tmp);
+}}).{nameof(Action.Invoke)}([provider]);
+"
+                : $@"
+[document].{nameof(XmlElement.AppendChild)}([document].{nameof(Document.CreateElement)}(""{Tag}""));
+";
+        }
+
         /// <summary>
         /// 获取生成节点的代码
         /// </summary>
@@ -76,25 +99,9 @@ namespace Feast.JsonAnnotation.Structs.Doc
         /// <returns></returns>
         public string GetGenerateCode(string documentVariable)
         {
-            return Parent != null
-                ? $@"
-new {nameof(Action)}(() =>
-{{
-    if( {documentVariable}.{nameof(XmlDocument.SelectSingleNode)}(""{Parent.ReplaceForCode}"") == null ) throw new {nameof(ArgumentNullException)}(""Parent node not exist""); //Parent node not exist
-    if( {documentVariable}.{nameof(XmlDocument.SelectSingleNode)}(""{ReplaceForCode}"") != null ) return; //Already generated
-    var tmp = {documentVariable}.{nameof(XmlDocument.CreateElement)}(""{Tag}"");
-    tmp.{nameof(XmlElement.SetAttribute)}(""name"", ""{Name}"");
-    var code = {documentVariable}.{nameof(XmlDocument.CreateElement)}(""code"");
-    tmp.{nameof(XmlNode.AppendChild)}(code);
-    {documentVariable}.{nameof(XmlDocument.SelectSingleNode)}(""{Parent.ReplaceForCode}"")?.{nameof(XmlNode.AppendChild)}(tmp);
-}}).{nameof(Action.Invoke)}();
+            return $@"{GetGenerateCode().Replace("[document]", documentVariable).Replace("[provider]", "\"\"")}
 
-{ ChildNodes.Select(x=>x.GetGenerateCode(documentVariable)).MultiLine() }
-"
-                : $@"
-{documentVariable}.{nameof(XmlElement.AppendChild)}({documentVariable}.{nameof(Document.CreateElement)}(""{Tag}""));
-{ChildNodes.Select(x => x.GetGenerateCode(documentVariable)).MultiLine()}
-";
+{ChildNodes.Select(x => x.GetGenerateCode(documentVariable)).MultiLine()}";
         }
 
         /// <summary>
