@@ -6,11 +6,20 @@ namespace Feast.JsonAnnotation.Run.Folder
 {
     namespace InnerSpace
     {
-        [Feast.JsonAnnotation.JsonAnnotation]
-        [JsonAnnotation]
-        [Another]
-        public partial class InnerClass
+        /// <summary>
+        /// <include file='Document.xml' path='Document/Namespace[@name="InnerSpace"]/Class[@name="Class"]/code'/>
+        /// </summary>
+        public partial class Class
         {
+            /// <summary>
+            /// <include file='Document.xml' path='Document/Namespace[@name="InnerSpace"]/Class[@name="Class"]/Class[@name="InnerClass"]'/>
+            /// </summary>
+            [Feast.JsonAnnotation.JsonAnnotation]
+            [JsonAnnotation]
+            [Another]
+            public partial class InnerClass
+            {
+            }
         }
     }
 
