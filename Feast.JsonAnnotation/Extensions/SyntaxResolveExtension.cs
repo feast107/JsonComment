@@ -77,10 +77,9 @@ namespace Feast.JsonAnnotation.Extensions
                 ret = ret == null ? identifier.Identifier.Text : $"{identifier.Identifier.Text}.{ret}";
                 tmp = tmp.Parent;
             }
-            ret ??= "";
             if ((tmp as BaseNamespaceDeclarationSyntax)?.Name is QualifiedNameSyntax name)
             {
-                ret = $"{name.GetFullName()}.{ret}";
+                ret = $"{name.GetFullName()}{(ret != null ? $".{ret}" : "")}";
             }
             return ret;
         }
