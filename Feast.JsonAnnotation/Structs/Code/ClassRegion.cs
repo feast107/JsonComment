@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Feast.JsonAnnotation.Extensions;
 using Feast.JsonAnnotation.Filters;
@@ -53,10 +54,7 @@ namespace Feast.JsonAnnotation.Structs.Code
 
         public List<CodeRegion.ExtraModifier> ExtraModifiers { get; set; } = new() { CodeRegion.ExtraModifier.Partial };
 
-        public List<AnnotationRegion<TFilter>> Annotations { get; set; } = new()
-        {
-            new AnnotationRegion<TFilter>()
-        };
+        public AnnotationRegion<TFilter> Annotation { get; set; } = new();
 
         public List<ClassRegion<TFilter>> Classes { get; set; } = new();
 
@@ -69,10 +67,10 @@ namespace Feast.JsonAnnotation.Structs.Code
         public override string ContentString(int tab = 0)
         {
             var sb = new StringBuilder();
-            Annotations.ForEach(a =>
+            if (Annotation.Annotations.Count > 0)
             {
-                sb.AppendMultipleLineWithTab(a.ContentString(),tab);
-            });
+                sb.AppendMultipleLineWithTab(Annotation.ContentString(), tab);
+            }
 
             sb.AppendLineWithTab(
                 $"{ExtraModifiers.WithBlank(StringFormatExtension.ToCodeString)}" +
@@ -100,6 +98,18 @@ namespace Feast.JsonAnnotation.Structs.Code
             return sb.ToString();
         }
 
+
+        public string GetJsonGenerateCode()
+        { 
+            var item = Class.GetFullClassName();
+            return $@"
+new {nameof(Action)}(()=>{{
+    var instance = 
+    typeof({item.Item1}.{item.Item2}).{nameof(Type.GetProperties)}().{nameof(Enumerable.ToList)}().{nameof(List<PropertyInfo>.ForEach)}(p=>{{
+        
+    }});
+}}).{nameof(Action.Invoke)}()";
+        }
     }
 }
  
