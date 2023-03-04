@@ -1,11 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using Feast.JsonAnnotation.Extensions;
+﻿using Feast.JsonAnnotation.Extensions;
 using Feast.JsonAnnotation.Filters;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.Text;
 
 namespace Feast.JsonAnnotation.Structs.Code
 {
@@ -100,14 +103,28 @@ namespace Feast.JsonAnnotation.Structs.Code
 
 
         public string GetJsonGenerateCode()
-        { 
+        {
             var item = Class.GetFullClassName();
+
+            var thisType = "thisType";
+            var instance = "instance";
+            var property = "property";
+
             return $@"
-new {nameof(Action)}(()=>{{
-    var instance = 
-    typeof({item.Item1}.{item.Item2}).{nameof(Type.GetProperties)}().{nameof(Enumerable.ToList)}().{nameof(List<PropertyInfo>.ForEach)}(p=>{{
-        
-    }});
+new {nameof(Func<string>)}<{nameof(String)}>(()=>{{
+    var {thisType} = typeof({item.Item1}.{item.Item2});
+    var {instance} = {typeof(FormatterServices).FullName}.{nameof(FormatterServices.GetUninitializedObject)}({thisType});
+     foreach (var {property} in thisType.{nameof(Type.GetProperties)}())
+    {{
+        if ({property} is not {{ {nameof(PropertyInfo.CanRead)}: true, {nameof(PropertyInfo.CanWrite)}: true }}) break;
+{XmlGenerateExtension.GetValueMapper(property,instance).InsertTab()}
+    }}
+    var stream = new {typeof(MemoryStream).FullName}();
+    new {typeof(DataContractJsonSerializer).FullName}(thisType).{nameof(DataContractJsonSerializer.WriteObject)}(stream, {instance});
+    stream.{nameof(Stream.Position)} = 0;    
+    var bytes = new byte[stream.{nameof(Stream.Length)}];
+    _ = stream.{nameof(Stream.Read)}(bytes, 0, (int)stream.{nameof(Stream.Length)});
+    return {typeof(Encoding).FullName}.{nameof(Encoding.UTF8)}.{nameof(Encoding.GetString)}(bytes);
 }}).{nameof(Action.Invoke)}()";
         }
     }
