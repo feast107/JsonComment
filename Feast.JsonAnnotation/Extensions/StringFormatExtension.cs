@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Feast.JsonAnnotation.Structs.Code;
+using System.Reflection.Metadata;
 
 namespace Feast.JsonAnnotation.Extensions
 {
@@ -27,7 +28,12 @@ namespace Feast.JsonAnnotation.Extensions
         internal static string InsertTab(this string code,int count = 1)
         {
             var tab = "\t".Repeat(count);
-            return tab + code.Replace("\n", $"\n{tab}");
+            var last = code[code.Length - 1] == '\n';
+            if (last)
+            {
+                code = code.Remove(code.Length - 1, 1);
+            }
+            return tab + code.Replace("\n", $"\n{tab}") + (last ? '\n' : "");
         }
 
         internal static string ToCodeString(this string str)
