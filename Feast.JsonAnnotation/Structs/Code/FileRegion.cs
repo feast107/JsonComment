@@ -1,10 +1,9 @@
-﻿using System;
-using Feast.JsonAnnotation.Extensions;
+﻿using Feast.JsonAnnotation.Extensions;
+using Feast.JsonAnnotation.Filters;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Feast.JsonAnnotation.Filters;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Feast.JsonAnnotation.Structs.Code
 {
@@ -82,6 +81,22 @@ namespace Feast.JsonAnnotation.Structs.Code
             return sb.ToString();
         }
 
+        public override bool Clip()
+        {
+            var index = 0;
+            while (index < Namespaces.Count)
+            {
+                if (Namespaces[index].Clip())
+                {
+                    Namespaces.RemoveAt(index);
+                }
+                else
+                {
+                    index++;
+                }
+            }
+            return true;
+        }
     }
 
     
