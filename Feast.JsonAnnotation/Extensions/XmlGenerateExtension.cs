@@ -13,6 +13,10 @@ namespace Feast.JsonAnnotation.Extensions
 {
     internal static class XmlGenerateExtension
     {
-       
+        public static string GetValueMapper(string propertyVariable,string instanceVariable)
+        {
+            return $@"int r1;
+int r2;";
+        }
     }
 }
