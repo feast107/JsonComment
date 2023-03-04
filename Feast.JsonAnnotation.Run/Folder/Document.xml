@@ -1,10 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Document>
-	<Model name="Model">
-		<code>
-{
-	"Attr" : 1,	
-}
-		</code>
-	</Model>
+	<Namespace name="InnerSpace">
+		<Class name="Class">
+			<code>
+			{
+				"Attr" : 1,
+			}
+			</code>
+				<Class name="InnerClass">
+					<code>
+					{
+						"InnerAttr" : 1,
+					}
+					</code>
+				</Class>
+		</Class>
+	</Namespace>
 </Document>
