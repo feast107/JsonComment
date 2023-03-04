@@ -2,8 +2,8 @@
 using Feast.JsonAnnotation.Filters;
 using Feast.JsonAnnotation.Structs.Code;
 using Feast.JsonAnnotation.Structs.Doc;
+using System;
 using System.Xml;
-using XmlGenerateExtension = Feast.JsonAnnotation.Extensions.XmlGenerateExtension;
 
 namespace Feast.JsonAnnotation.Generators
 {
@@ -41,6 +41,7 @@ namespace Feast.JsonAnnotation.Generators
             XmlGenerationConfig config)
             where TFilter : SyntaxFilter<TFilter>
         {
+            fileRegion.Clip();
             var root = Document.DocumentElement;
             if (root == null)
             {
@@ -91,9 +92,12 @@ namespace Feast.JsonAnnotation.Generators
             var annotation = thisNode.Annotation("Document.xml");
             classRegion.Annotation.Annotations.Add(annotation);
             var str = thisNode.ToString();
+            var codeGen = classRegion.GetJsonGenerateCode();
+            thisNode.SetJsonProvider(classRegion.GetJsonGenerateCode());
             var code = thisNode.GetRouteCode("dom");
             var gen = thisNode.GetGenerateCode("dom");
             classRegion.Classes.ForEach(c => { Map(thisNode, c); });
         }
+       
     }
 }
