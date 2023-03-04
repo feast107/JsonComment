@@ -59,7 +59,12 @@ namespace Feast.JsonAnnotation.Extensions
             return className.EndsWith(nameof(Attribute)) ? className.Remove(className.Length - 9, 9) : className;
         }
 
-
+        internal static string MultiLine(this IEnumerable<string> source)
+        {
+            var sb = new StringBuilder();
+            foreach (var item in source) { sb.AppendLine(item); }
+            return sb.ToString();
+        }
 
         internal static StringBuilder AppendLineWithTab(this StringBuilder builder, string content, int tab = 0) =>
             builder.AppendLine($"{"\t".Repeat(tab)}{content}");
