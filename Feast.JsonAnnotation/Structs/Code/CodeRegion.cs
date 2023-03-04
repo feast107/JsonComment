@@ -45,5 +45,7 @@ namespace Feast.JsonAnnotation.Structs.Code
         public static ProgramRegion<TFilter> Program { get; } = new();   
         public abstract string ContentString(int tab = 0);
         public virtual int DefaultTabCount { get; set; } = 1;
+
+        public virtual bool Clip() => false;
     }
 }
