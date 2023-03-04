@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Feast.JsonAnnotation.Filters;
+using System.Reflection;
 
 namespace Feast.JsonAnnotation.Structs.Code
 {
@@ -78,6 +79,23 @@ namespace Feast.JsonAnnotation.Structs.Code
                 return true;
             }
             return Namespaces.Any(n => n.TryAddNamespace(syntax));
+        }
+
+        public override bool Clip()
+        {
+            var index = 0;
+            while (index < Namespaces.Count)
+            {
+                if (Namespaces[index].Clip())
+                {
+                    Namespaces.RemoveAt(index);
+                }
+                else
+                {
+                    index++;
+                }
+            }
+            return Namespaces.Count + Classes.Count == 0;
         }
     }
 
