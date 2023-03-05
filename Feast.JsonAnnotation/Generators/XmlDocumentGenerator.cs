@@ -2,7 +2,6 @@
 using Feast.JsonAnnotation.Filters;
 using Feast.JsonAnnotation.Structs.Code;
 using Feast.JsonAnnotation.Structs.Doc;
-using System;
 using System.Xml;
 
 namespace Feast.JsonAnnotation.Generators
@@ -16,9 +15,13 @@ namespace Feast.JsonAnnotation.Generators
             Root = nameof(Document),
             Class = "Class",
             Namespace = "Namespace",
-            FilePath = "."
+            FileName = "JsonDocument.xml"
         };
 
+        public XmlNodeField Root { get; private set; }
+
+        public string GetGenerateCode(string documentVariable, bool generateDocument) =>
+            Root.GetGenerateCode(documentVariable, generateDocument);
 
         public static XmlDocumentGenerator MapFile<TFilter>(FileRegion<TFilter> region) 
             where TFilter : SyntaxFilter<TFilter>
@@ -48,12 +51,11 @@ namespace Feast.JsonAnnotation.Generators
                 root = Document.CreateElement(config.Root);
                 Document.AppendChild(root);
             }
-            var node = XmlNodeField.NewRootField(Document);
+            Root = XmlNodeField.NewRootField(Document);
             fileRegion.Namespaces.ForEach(n =>
             {
-                Map(node,n);
+                Map(Root, n);
             });
-            node.GetGenerateCode("dom");
         }
 
         /// <summary>
@@ -89,13 +91,9 @@ namespace Feast.JsonAnnotation.Generators
         {
             var classString = classRegion.Class.GetSelfClassName();
             var thisNode = parent.CreateChildField(Config.Class, classString);
-            var annotation = thisNode.Annotation("Document.xml");
+            var annotation = thisNode.Annotation(Config.FileName);
             classRegion.Annotation.Annotations.Add(annotation);
-            var str = thisNode.ToString();
-            var codeGen = classRegion.GetJsonGenerateCode();
             thisNode.SetJsonProvider(classRegion.GetJsonGenerateCode());
-            var code = thisNode.GetRouteCode("dom");
-            var gen = thisNode.GetGenerateCode("dom");
             classRegion.Classes.ForEach(c => { Map(thisNode, c); });
         }
        
