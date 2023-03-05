@@ -71,7 +71,7 @@ namespace Feast.JsonAnnotation.Structs.Doc
             cache = GetGenerateCode().Replace("[provider]", jsonGenerateCode)
                     ?? throw new NullReferenceException("Code hadn't been generate");
 
-        public string GetGenerateCode()
+        public string GetGenerateCode(bool generateRoot = true)
         {
             return cache ??= Parent != null
                 ? $@"
@@ -85,23 +85,24 @@ new {nameof(Action)}<{nameof(String)}>((codeString) =>
     code.{nameof(XmlNode.InnerText)} = codeString;
     tmp.{nameof(XmlNode.AppendChild)}(code);
     [document].{nameof(XmlDocument.SelectSingleNode)}(""{Parent.ReplaceForCode}"")?.{nameof(XmlNode.AppendChild)}(tmp);
-}}).{nameof(Action.Invoke)}([provider]);
-"
-                : $@"
-[document].{nameof(XmlElement.AppendChild)}([document].{nameof(Document.CreateElement)}(""{Tag}""));
-";
+}}).{nameof(Action.Invoke)}([provider]);"
+                : generateRoot
+                    ? $@"[document].{nameof(XmlElement.AppendChild)}([document].{nameof(Document.CreateElement)}(""{Tag}""));"
+                    : string.Empty;
         }
 
         /// <summary>
         /// 获取生成节点的代码
         /// </summary>
         /// <param name="documentVariable"></param>
+        /// <param name="generateRoot">是否需要生成根节点</param>
         /// <returns></returns>
-        public string GetGenerateCode(string documentVariable)
+        public string GetGenerateCode(string documentVariable,bool generateRoot = true)
         {
-            return $@"{GetGenerateCode().Replace("[document]", documentVariable).Replace("[provider]", "\"\"")}
-
-{ChildNodes.Select(x => x.GetGenerateCode(documentVariable)).MultiLine()}";
+            return ChildNodes.Count == 0
+                ? string.Empty
+                : $@"{GetGenerateCode(generateRoot).Replace("[document]", documentVariable).Replace("[provider]", "\"\"")}
+{ChildNodes.Select(x => x.GetGenerateCode(documentVariable, generateRoot)).MultiLine()}";
         }
 
         /// <summary>
