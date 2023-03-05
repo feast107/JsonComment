@@ -28,12 +28,24 @@ namespace Feast.JsonAnnotation.Extensions
         internal static string InsertTab(this string code,int count = 1)
         {
             var tab = "\t".Repeat(count);
+            if (code.Length == 0) return tab;
             var last = code[code.Length - 1] == '\n';
             if (last)
             {
                 code = code.Remove(code.Length - 1, 1);
             }
             return tab + code.Replace("\n", $"\n{tab}") + (last ? '\n' : "");
+        }
+
+        internal static string InsertEachLine(this string code, string prefix)
+        {
+            if (code.Length == 0) return prefix;
+            var last = code[code.Length - 1] == '\n';
+            if (last)
+            {
+                code = code.Remove(code.Length - 1, 1);
+            }
+            return prefix + code.Replace("\n", $"\n{prefix}") + (last ? '\n' : "");
         }
 
         internal static string ToCodeString(this string str)
@@ -67,8 +79,16 @@ namespace Feast.JsonAnnotation.Extensions
 
         internal static string MultiLine(this IEnumerable<string> source)
         {
+            return MultiLine(source, string.Empty);
+        }
+
+        internal static string MultiLine(this IEnumerable<string> source, string prefix)
+        {
             var sb = new StringBuilder();
-            foreach (var item in source) { sb.AppendLine(item); }
+            foreach (var item in source)
+            {
+                sb.Append(item.InsertEachLine(prefix));
+            }
             return sb.ToString();
         }
 
@@ -77,14 +97,18 @@ namespace Feast.JsonAnnotation.Extensions
         internal static StringBuilder AppendMultipleLineWithTab(this StringBuilder builder, string content, int tab = 0)
         {
             var tabs = "\t".Repeat(tab);
-            if (content[content.Length-1] == '\n')
+            return builder.AppendMultipleLineWith(content, tabs);
+        }
+
+        internal static StringBuilder AppendMultipleLineWith(this StringBuilder builder, string content, string prefix)
+        {
+            if (content[content.Length - 1] == '\n')
             {
                 content = content.Remove(content.Length - 1, 1);
             }
-            return builder.Append(tabs)
-            .Append(content.Replace("\n", $"\n{tabs}"))
-            .Append('\n');
-
+            return builder.Append(prefix)
+                .Append(content.Replace("\n", $"\n{prefix}"))
+                .Append('\n');
         }
     }
 }
