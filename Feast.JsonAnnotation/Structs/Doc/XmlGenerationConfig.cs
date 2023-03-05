@@ -13,6 +13,6 @@ namespace Feast.JsonAnnotation.Structs.Doc
 
         public required string Class { get; set; } = nameof(Class);
 
-        public required string FilePath { get; init; }
+        public required string FileName { get; init; }
     }
 }
