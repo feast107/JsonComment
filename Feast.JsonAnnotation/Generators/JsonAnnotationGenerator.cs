@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis;
 using System;
 using System.Diagnostics;
-using System.Linq;
 using Feast.JsonAnnotation.Filters;
 
 namespace Feast.JsonAnnotation.Generators
@@ -13,30 +12,29 @@ namespace Feast.JsonAnnotation.Generators
         private readonly JsonAttributeFilter receiver = JsonAttributeFilter.Instance;
         public void Initialize(GeneratorInitializationContext context)
         {
-            Debugger.Launch();
             context.RegisterForSyntaxNotifications(() => receiver);
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
             if (receiver.Generated) return;
-            var s = receiver.Results;
+            var s = receiver.Codes;
+            
             s.ForEach(x =>
             {
                 context.AddSource($"{Guid.NewGuid().ToString().Replace('-', '_')}.g.cs", x.Value);
             });
-            
-            context.AddSource($"{nameof(JsonAnnotation)}.ext.cs",
-                $@"using System;
+
+            var generateCode = $@"using System;
 
 namespace Feast.JsonAnnotation{{
     public class {nameof(JsonAnnotation)}{{
         public static void {nameof(JsonAnnotation.Generate)}(){{
-            
+{receiver.Generators.Values.MultiLine("            ")}
         }}
     }}
-}}
-");
+}}";
+            context.AddSource($"{nameof(JsonAnnotation)}.ext.cs", generateCode);
         }
     }
 }
