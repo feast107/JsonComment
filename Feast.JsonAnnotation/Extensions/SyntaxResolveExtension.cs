@@ -104,13 +104,15 @@ namespace Feast.JsonAnnotation.Extensions
 
         internal static string GetName(this AttributeSyntax syntax)
         {
-            return (syntax.Name) switch
+            return syntax.Name switch
             {
                 QualifiedNameSyntax qa => qa.GetFullName(),
                 IdentifierNameSyntax ia => ia.Identifier.Text,
                 _ => throw new NotSupportedException()
             };
         }
+
+
 
         internal static bool IsDirectInnerNamespaceOf(this BaseNamespaceDeclarationSyntax syntax,
             BaseNamespaceDeclarationSyntax another) => syntax.Parent == another;
@@ -125,6 +127,32 @@ namespace Feast.JsonAnnotation.Extensions
                 parent = par.Parent;
             }
             return false;
+        }
+
+        /// <summary>
+        /// 能否引用到某属性
+        /// </summary>
+        /// <typeparam name="TFilter"></typeparam>
+        /// <param name="file">文件域</param>
+        /// <param name="syntax">类声明</param>
+        /// <param name="attribute">检测属性</param>
+        /// <param name="targetNamespace">目标命名空间</param>
+        /// <param name="targetClassName">目标类名</param>
+        /// <returns></returns>
+        internal static bool CanReferenceTo<TFilter>(this FileRegion<TFilter> file,
+            ClassDeclarationSyntax syntax,
+            AttributeSyntax attribute,
+            string targetNamespace,
+            string targetClassName)
+        where TFilter : SyntaxFilter<TFilter>
+        {
+            var fullAttributeName = $"{targetNamespace}.{targetClassName}";
+            var name = attribute.GetName();
+            return name == fullAttributeName
+                   || syntax.GetNamespace().StartsWith(targetNamespace) && targetClassName == name
+                   || file.UsingNamespaces.Any(n => $"{n}.{name}" == fullAttributeName)
+                   || file.AliasUsingNamespaces.Any(a =>
+                       name.Replace(a.Key, a.Value).WithoutAttribute() == fullAttributeName);
         }
 
         internal static bool IsDirectInnerClassOf(this ClassDeclarationSyntax syntax, ClassDeclarationSyntax another) => syntax.Parent == another;
