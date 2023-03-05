@@ -3,7 +3,6 @@ using AnotherNamespace = Feast.JsonAnnotation;
 
 namespace Feast.JsonAnnotation.Run
 {
-    
     [JsonAnnotation]
     [AnotherClassName]
     [AnotherNamespace.JsonAnnotation]
