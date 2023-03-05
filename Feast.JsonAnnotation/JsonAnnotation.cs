@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Runtime.InteropServices.ComTypes;
+﻿using System.Runtime.Serialization.Json;
 
 namespace Feast.JsonAnnotation
 {
