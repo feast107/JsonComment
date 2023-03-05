@@ -13,7 +13,7 @@
     ```
     ``` xml
     <ItemGroup>
-        <ProjectReference Include="path\to\Feast.JsonAnnotation.csproj" OutputItemType="Analyzer" />
+        <ProjectReference Include="path\to\Feast.JsonComment.csproj" OutputItemType="Analyzer" />
     </ItemGroup>
     ```
     由于需要引用包中的内容，请忽略 `ReferenceOutputAssembly` 项或将其置为 `true` 
