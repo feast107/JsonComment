@@ -1,0 +1,12 @@
+<Document>
+  <Namespace name="Feast.JsonAnnotation.Run">
+    <code>
+    </code>
+    <Class name="BasicUsing">
+      <code>{
+  "Id": 0,
+  "Name": null
+}</code>
+    </Class>
+  </Namespace>
+</Document>
