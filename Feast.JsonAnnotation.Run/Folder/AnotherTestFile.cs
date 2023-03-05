@@ -6,6 +6,7 @@ namespace Feast.JsonAnnotation.Run.Folder
 {
     namespace InnerSpace
     {
+
         /// <summary>
         /// <include file='Document.xml' path='Document/Namespace[@name="InnerSpace"]/Class[@name="Class"]/code'/>
         /// </summary>
