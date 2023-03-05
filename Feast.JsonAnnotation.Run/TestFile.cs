@@ -10,6 +10,10 @@ namespace Feast.JsonAnnotation.Run
     [Feast.JsonAnnotation.JsonAnnotation]
     public partial class BasicUsing
     {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
         [AnotherClassName]
         public partial class SubClass
         {
