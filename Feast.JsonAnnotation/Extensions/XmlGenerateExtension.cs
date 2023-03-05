@@ -15,8 +15,7 @@ namespace Feast.JsonAnnotation.Extensions
     {
         public static string GetValueMapper(string propertyVariable,string instanceVariable)
         {
-            return $@"int r1;
-int r2;";
+            return $@"";
         }
     }
 }
