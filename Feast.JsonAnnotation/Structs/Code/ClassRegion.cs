@@ -119,12 +119,15 @@ new {nameof(Func<string>)}<{nameof(String)}>(()=>{{
         if ({property} is not {{ {nameof(PropertyInfo.CanRead)}: true, {nameof(PropertyInfo.CanWrite)}: true }}) break;
 {XmlGenerateExtension.GetValueMapper(property,instance).InsertTab()}
     }}
+    /*
     var stream = new {typeof(MemoryStream).FullName}();
     new {typeof(DataContractJsonSerializer).FullName}(thisType).{nameof(DataContractJsonSerializer.WriteObject)}(stream, {instance});
     stream.{nameof(Stream.Position)} = 0;    
     var bytes = new byte[stream.{nameof(Stream.Length)}];
     _ = stream.{nameof(Stream.Read)}(bytes, 0, (int)stream.{nameof(Stream.Length)});
     return {typeof(Encoding).FullName}.{nameof(Encoding.UTF8)}.{nameof(Encoding.GetString)}(bytes);
+    */
+    return System.Text.Json.JsonSerializer.Serialize({instance},new System.Text.Json.JsonSerializerOptions(){{ WriteIndented = true }});
 }}).{nameof(Action.Invoke)}()";
         }
     }
