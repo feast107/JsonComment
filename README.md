@@ -1,4 +1,4 @@
-# JsonAnnotation
+# JsonComment
 能够通过注解自动生成文档注释的基于 `.NET Standard 2.0` 的代码分析器
 
 :construction: :construction: **施工中注意——仍有bug** :construction: :construction:
@@ -20,11 +20,11 @@
     ``` json
     ReferenceOutputAssembly="true"
     ```
-+ 在你需要生成注释的类型上添加 `JsonAnnotation`
++ 在你需要生成注释的类型上添加 `JsonComment`
     ``` c#
-    using Feast.JsonAnnotation;
+    using Feast.JsonComment;
 
-    [JsonAnnotation]
+    [JsonComment]
     public partial class MyModel{
         public int Id { get; init; } 
         public string Name { get; set; } 
@@ -35,13 +35,13 @@
     + :ok_hand: 本程序集不会对任何类型进行增改
 
 
-+ 在你的程序中调用 `JsonAnnotation.Generate()`
++ 在你的程序中调用 `JsonComment.Generate()`
     ``` c#
     internal class Program
     {
         static void Main(string[] args)
         {
-            JsonAnnotation.Generate();
+            JsonComment.Generate();
         }
     }
     ```

@@ -26,7 +26,7 @@ namespace Feast.JsonComment.Generators
 
             var generateCode = $@"using System;
 
-namespace Feast.JsonAnnotation{{
+namespace {nameof(Feast)}.{nameof(JsonComment)}{{
     public class {nameof(JsonComment)}{{
         public static void {nameof(JsonComment.Generate)}(){{
 {receiver.Generators.Values.MultiLine("            ")}
